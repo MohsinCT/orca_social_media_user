@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "46291325751",
+    "project_id": "orca-socialmedia-e8c58",
+    "storage_bucket": "orca-socialmedia-e8c58.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:46291325751:android:6ca589c3ee483a523ec0b2",
+        "android_client_info": {
+          "package_name": "com.example.orca_social_media"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhwzjk5LAimeiysNdCn9zgFNP-Ejnita8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
