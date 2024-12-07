@@ -4,6 +4,7 @@ import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/models/register_model.dart';
+import 'package:orca_social_media/view/screens/mobile/profile_screen/edit_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -68,14 +69,19 @@ class UserDetails extends StatelessWidget {
                         onTap: () {
                           // Add your edit profile functionality here
                         },
-                        child: Container(
-                          width: 70,
-                          height: 30,
-                          decoration: const BoxDecoration(
-                            color: AppColors.oRLightGrey,
-                          ),
-                          child: const Center(
-                            child: Text('Edit Profile'),
+                        child: InkWell(
+                          onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) => EditProfile(user: user,))),
+                          child: Container(
+                            width: 70,
+                            height: 30,
+                            decoration: const BoxDecoration(
+                              color: AppColors.oRLightGrey,
+                            ),
+                            child: const Center(
+                              child: Text('Edit Profile'),
+                            ),
                           ),
                         ),
                       ),
@@ -87,12 +93,10 @@ class UserDetails extends StatelessWidget {
                   style: const TextStyle(fontSize: 20),
                 ),
                 SizedBox(height: mediaQuery.screenHeight * 0.02),
-                const Text('Nickname'),
+                Text(user.nickname),
                 SizedBox(height: mediaQuery.screenHeight * 0.02),
-                const Text(
-                  'Experienced trader specializing in [specific] '
-                  'market e.g., forex stocks with a focus on disciplined '
-                  'risk management and data-driven strategies',
+                Text(
+                  user.bio,
                 ),
                 SizedBox(height: mediaQuery.screenHeight * 0.02),
                 Row(
@@ -131,17 +135,17 @@ class UserDetails extends StatelessWidget {
                     ),
                   ],
                 ),
-                const ListTile(
+                ListTile(
                   leading: Icon(Icons.location_on),
                   title: Text(
-                    'Location Not Available',
+                    user.location,
                     style: TextStyle(fontSize: 12),
                   ),
                 ),
-                const ListTile(
+                ListTile(
                   leading: Icon(Icons.card_membership),
                   title: Text(
-                    'Member since Sep 2, 2024',
+                    'Member since ${user.date}',
                     style: TextStyle(fontSize: 12),
                   ),
                 ),
