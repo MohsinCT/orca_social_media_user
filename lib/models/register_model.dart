@@ -7,9 +7,11 @@ class UserModel {
   final String nickname;
   final String location;
   final String date;
+  final dynamic timestamp;
 
-  UserModel(
+  UserModel( 
       {required this.email,
+      required this.timestamp,
       required this.nickname,
       required this.bio,
       required this.location,
@@ -28,18 +30,23 @@ class UserModel {
       'bio': bio,
       'nickname': nickname,
       'location': location,
-      'date':date
+      'date':date,
+      'timestamp':timestamp
     };
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
+      
         email: map['email'],
+        timestamp: map['timestamp'],
         nickname: map['nickname'],
         bio: map['bio'],
         location: map['location'],
         password: map['password'],
         username: map['username'],
-        profilPicture: map['profilePicture'], date: map['date']);
+        profilPicture: map['profilePicture'], date: map['date'],
+        
+        );
   }
 }

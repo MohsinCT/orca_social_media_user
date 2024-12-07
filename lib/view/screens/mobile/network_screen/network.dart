@@ -1,9 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:orca_social_media/constants/images.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/search_controller.dart';
+import 'package:orca_social_media/models/register_model.dart';
+import 'package:orca_social_media/view/screens/mobile/network_screen/users_list.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_search_field.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -15,21 +18,85 @@ class NetworkScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final searchProvider = Provider.of<SearchControllerProvider>(context);
     final mediaQuery = MediaQueryHelper(context);
+    final userProvider = Provider.of<UserProvider>(context);
+    
     return Scaffold(
-      appBar: AppBar(
-        elevation: 3,
-        automaticallyImplyLeading: false,
-        title: const Text('Networking'),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(
+            mediaQuery.screenHeight * 0.15), // Adjust height as needed
+        child: AppBar(
+          elevation: 3,
+          automaticallyImplyLeading: false,
+          flexibleSpace: Padding(
+            padding: EdgeInsets.only(
+              top: mediaQuery.screenHeight * 0.02,
+              left: mediaQuery.screenWidth * 0.04,
+              right: mediaQuery.screenWidth * 0.04,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Networking',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: mediaQuery.screenHeight * 0.01),
+                Consumer<UserProvider>(
+                  builder: (context, userProvider, child) {
+                    return  SearchField(
+                    controller: searchProvider.searchController,
+                    onChanged: (value) {
+                      userProvider.filterUsers(value);
+                    },
+                  );
+                  },
+                
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
-      body: SingleChildScrollView(
+      body:searchProvider.searchController.text.isNotEmpty?
+    ChangeNotifierProvider(
+  create: (context) => UserProvider()..fetchAndSetUsers(),
+  child: Consumer<UserProvider>(
+    builder: (context, userProvider, child) {
+      return Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: userProvider.filteredUsers.length,
+              itemBuilder: (context, index) {
+                final user = userProvider.filteredUsers[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: user.profilPicture != null
+                        ? NetworkImage(user.profilPicture!)
+                        : null,
+                    child: user.profilPicture == null ? Icon(Icons.person) : null,
+                  ),
+                  title: Text(user.username),
+                  subtitle: Text(user.nickname),
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    },
+  ),
+):
+
+         
+       SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(
               height: mediaQuery.screenHeight * 0.01,
             ),
-            SearchField(
-                controller: searchProvider.searchController,
-                onChanged: (value) {}),
+
             Padding(
               padding: EdgeInsets.only(
                   left: mediaQuery.screenWidth * 0.04,
@@ -160,7 +227,7 @@ class NetworkScreen extends StatelessWidget {
                                       width: mediaQuery.screenWidth * 0.1,
                                     ),
                                     Text(
-                                      user.nickname,
+                                      user.username,
                                       style: TextStyle(
                                           fontSize:
                                               mediaQuery.screenWidth * 0.03),
@@ -248,7 +315,7 @@ class NetworkScreen extends StatelessWidget {
                                 SizedBox(
                                   height: mediaQuery.screenHeight * 0.02,
                                 ),
-                                Text(userR.nickname),
+                                Text(userR.username),
                               ],
                             ),
                           );

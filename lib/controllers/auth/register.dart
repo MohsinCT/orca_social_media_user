@@ -22,7 +22,6 @@ class UserProvider with ChangeNotifier {
 
 //--------------------------------FetchSingleUser ------------------------------------//
 
-
   Future<UserModel?> fetchUserDetails() async {
     try {
       User? currentUser = _auth.currentUser;
@@ -38,60 +37,86 @@ class UserProvider with ChangeNotifier {
       log('Error fetching user credentials $e');
     }
   }
+
+  
+ 
+
   //--------------------------------FetchAllUsers ------------------------------------//
   Future<List<UserModel>> fetchAllUsers() async {
-  try {
-    QuerySnapshot querySnapshot = await _firestore.collection('users').get();
-    return querySnapshot.docs
-        .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
-        .toList();
-  } catch (e) {
-    log('Error fetching all users: $e');
-    return [];
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .orderBy('timestamp', descending: true) // Order by timestamp
+          .get();
+      return querySnapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      log('Error fetching all users: $e');
+      return [];
+    }
   }
-}
+ List<UserModel> _filteredUsers = [];
+  List<UserModel> get filteredUsers => _filteredUsers.isEmpty ? _allUsers : _filteredUsers;
+  List<UserModel> _allUsers = [];
+  List<UserModel> get allUsers => _allUsers;
 
-List<UserModel> _allUsers = [];
-List<UserModel> get allUsers => _allUsers;
+  Future<void> fetchAndSetUsers() async {
+    _allUsers = await fetchAllUsers();
+    _filteredUsers = _allUsers;
+    notifyListeners();
+  }
 
-Future<void> fetchAndSetUsers() async {
-  _allUsers = await fetchAllUsers();
-  notifyListeners();
-}
-
-
-
+  void filterUsers(String query) {
+    if (query.isEmpty) {
+      _filteredUsers = _allUsers;
+    } else {
+      _filteredUsers = _allUsers
+          .where((user) => user.username.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+    notifyListeners();
+  }
 
   //--------------------------------Add User ------------------------------------//
 
-  Future<void> registerUser(
-      {required String username,
-      required String email,
-      required String password,
-      required File profilPicture}) async {
+  Future<void> registerUser({
+    required String username,
+    required String email,
+    required String password,
+    required File profilPicture,
+  }) async {
     try {
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      String? dounloadImAGE = await uploadImage(profilPicture);
+      String? downloadImage = await uploadImage(profilPicture);
 
-      UserModel user = UserModel(
-          email: email,
-          password: password,
-          username: username,
-          profilPicture: dounloadImAGE.toString(),
-          nickname: 'Add nickname',
-          bio: 'Add Bio',
-          location: 'Add location',
-          date: DateFormat('MMM,d,yyyy').format(DateTime.now()));
+      UserModel newUser = UserModel(
+        email: email,
+        password: password,
+        username: username,
+        profilPicture: downloadImage.toString(),
+        nickname: 'Add nickname',
+        bio: 'Add Bio',
+        location: 'Add location',
+        date: DateFormat('MMM,d,yyyy').format(DateTime.now()),
+        timestamp: DateTime.now(),
+      );
 
       await _firestore
           .collection('users')
           .doc(userCredential.user!.uid)
-          .set(user.toMap());
+          .set(newUser.toMap());
+
+      // Add the new user to the top of _allUsers
+      _allUsers.insert(0, newUser);
       notifyListeners();
     } catch (e) {
-      throw Exception('Failed to register user:$e');
+      throw Exception('Failed to register user: $e');
     }
   }
 
@@ -116,8 +141,8 @@ Future<void> fetchAndSetUsers() async {
     _profileImage = image;
     notifyListeners();
   }
-  
-  void resetImage(String image){
+
+  void resetImage(String image) {
     image = '';
     notifyListeners();
   }
@@ -164,4 +189,36 @@ Future<void> fetchAndSetUsers() async {
       log('Error in editing user profile $e');
     }
   }
+
+  //--------------------------------Search User------------------------------------//
+  Future<List<UserModel>> searchUsers(String query) async {
+    try {
+      // Ensure the query string is not empty
+      if (query.trim().isEmpty) {
+        return [];
+      }
+
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('username', isGreaterThanOrEqualTo: query)
+          .where('username', isLessThanOrEqualTo: query + '\uf8ff')
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      log('Error searching users: $e');
+      return [];
+    }
+  }
+
+  List<UserModel> _searchResults = [];
+List<UserModel> get searchResults => _searchResults;
+
+Future<void> fetchSearchResults(String query) async {
+  _searchResults = await searchUsers(query);
+  notifyListeners();
+}
+
 }
