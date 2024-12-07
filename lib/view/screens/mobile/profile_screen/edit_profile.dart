@@ -52,6 +52,7 @@ class _EditProfileState extends State<EditProfile> {
         nickname: nickNameController.text.trim(),
         location: locationController.text.trim(),
       );
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profile updated successfully!')),
       );

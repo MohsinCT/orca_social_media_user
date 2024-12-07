@@ -94,9 +94,12 @@ class LoginForm extends StatelessWidget {
                                   Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
                                       builder: (context) => BottomNavScreen(),
+                                  
                                     ),
                                   );
                                 }
+                                
+                                passwordController.clear();
                               } catch (e) {
                                 // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context)

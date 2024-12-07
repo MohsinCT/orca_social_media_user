@@ -90,6 +90,7 @@ class SignUpButton extends StatelessWidget {
                         MaterialPageRoute(
                             builder: (ctx) =>  BottomNavScreen()),
                       );
+                       Provider.of<UserProvider>(context, listen: false).resetImage(image);
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Error: $e')),

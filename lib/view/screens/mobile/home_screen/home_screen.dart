@@ -49,7 +49,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: LiquidPullToRefresh(
-        color: AppColors.oRLightGrey,
+        color: AppColors.oRBlack,
         animSpeedFactor: 2,
         showChildOpacityTransition: false,
         onRefresh: () => _handleRefresh(context),

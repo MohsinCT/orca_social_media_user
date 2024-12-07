@@ -20,6 +20,9 @@ class UserProvider with ChangeNotifier {
   File? _profileImage;
   File? get profileImage => _profileImage;
 
+//--------------------------------FetchSingleUser ------------------------------------//
+
+
   Future<UserModel?> fetchUserDetails() async {
     try {
       User? currentUser = _auth.currentUser;
@@ -35,6 +38,29 @@ class UserProvider with ChangeNotifier {
       log('Error fetching user credentials $e');
     }
   }
+  //--------------------------------FetchAllUsers ------------------------------------//
+  Future<List<UserModel>> fetchAllUsers() async {
+  try {
+    QuerySnapshot querySnapshot = await _firestore.collection('users').get();
+    return querySnapshot.docs
+        .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+        .toList();
+  } catch (e) {
+    log('Error fetching all users: $e');
+    return [];
+  }
+}
+
+List<UserModel> _allUsers = [];
+List<UserModel> get allUsers => _allUsers;
+
+Future<void> fetchAndSetUsers() async {
+  _allUsers = await fetchAllUsers();
+  notifyListeners();
+}
+
+
+
 
   //--------------------------------Add User ------------------------------------//
 
@@ -88,6 +114,11 @@ class UserProvider with ChangeNotifier {
 
   void setProfileImage(File? image) {
     _profileImage = image;
+    notifyListeners();
+  }
+  
+  void resetImage(String image){
+    image = '';
     notifyListeners();
   }
 
