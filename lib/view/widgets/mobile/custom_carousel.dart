@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/fetch_datas_controller.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/upcoming_courses_details.dart';
 import 'package:provider/provider.dart';
-
 
 class UpcomeingCourseCarousel extends StatelessWidget {
   const UpcomeingCourseCarousel({super.key});
@@ -14,11 +14,9 @@ class UpcomeingCourseCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
 
-    // Access FetchUpcomingCourses provider
     final fetchUpcomingCourses = Provider.of<FetchUpcomingCourses>(context);
     final courses = fetchUpcomingCourses.upComingCourseList;
 
-    // Trigger data fetch if courses list is empty
     if (courses.isEmpty) {
       Future.microtask(() => fetchUpcomingCourses.fetchUpcomingCourses());
     }
@@ -63,13 +61,13 @@ class UpcomeingCourseCarousel extends StatelessWidget {
                           bottomLeft: Radius.circular(15),
                           bottomRight: Radius.circular(15),
                         ),
-                        color: Colors.black.withOpacity(0.5),
+                        color: AppColors.oRBlack.withOpacity(0.5),
                       ),
                       width: mediaQuery.screenWidth * 0.8,
                       child: Text(
                         course.upcomingCourseName,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style:  TextStyle(
+                          color: AppColors.oRwhite,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),

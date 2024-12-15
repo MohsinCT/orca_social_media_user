@@ -7,6 +7,7 @@ import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/models/register_model.dart';
 import 'package:orca_social_media/view/screens/mobile/profile_screen/edit_profile.dart';
+import 'package:orca_social_media/view/widgets/mobile/custom_user_shimmer.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -22,15 +23,14 @@ class UserDetails extends StatelessWidget {
           Provider.of<UserProvider>(context, listen: false).fetchUserDetails(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return _buildShimmerEffect(mediaQuery);
+          return UserProfileShimmer();
         } else if (snapshot.hasError) {
           return Center(
             child: Text('Error: ${snapshot.error}'),
           );
         } else if (snapshot.hasData && snapshot.data != null) {
           final user = snapshot.data!;
-          return SingleChildScrollView(
-            child: Column(
+          return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
@@ -40,20 +40,21 @@ class UserDetails extends StatelessWidget {
                   child: ListTile(
                     leading: // Ensures the image fits inside the circle
                         GestureDetector(
-                          onLongPress: (){
-                            _showAvatarDetail(context, user.profilPicture);
-                          },
-                          child: Container(
-                                                width: mediaQuery.screenWidth *
+                      onLongPress: () {
+                        _showAvatarDetail(context, user.profilPicture);
+                      },
+                      child: Container(
+                        width: mediaQuery.screenWidth *
                             0.15, // Set the desired size (diameter)
-                                                height: mediaQuery.screenHeight *
+                        height: mediaQuery.screenHeight *
                             9, // Ensure width and height are equal for a circle
-                                                decoration: BoxDecoration(
-                          shape: BoxShape.circle, // Makes the container circular
+                        decoration: BoxDecoration(
+                          shape:
+                              BoxShape.circle, // Makes the container circular
                           border: Border.all(
                               color: Colors.grey, width: 2), // Optional border
-                                                ),
-                                                child: ClipOval(
+                        ),
+                        child: ClipOval(
                           child: CachedNetworkImage(
                             imageUrl: user.profilPicture,
                             width: 150, // Match the size of the container
@@ -66,9 +67,9 @@ class UserDetails extends StatelessWidget {
                                 Icons.error,
                                 size: 60), // Optional error widget
                           ),
-                                                ),
-                                              ),
                         ),
+                      ),
+                    ),
                     trailing: Padding(
                       padding:
                           EdgeInsets.only(right: mediaQuery.screenWidth * 0.07),
@@ -77,9 +78,11 @@ class UserDetails extends StatelessWidget {
                           // Add your edit profile functionality here
                         },
                         child: InkWell(
-                          onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) => EditProfile(user: user,))),
+                          onTap: () =>
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => EditProfile(
+                                        user: user,
+                                      ))),
                           child: Container(
                             width: 70,
                             height: 30,
@@ -157,8 +160,8 @@ class UserDetails extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          );
+            );
+          
         } else {
           return const Center(
             child: Text('User not found.'),
@@ -286,8 +289,6 @@ Widget _buildShimmerEffect(MediaQueryHelper mediaQuery) {
   );
 }
 
-
-
 void _showAvatarDetail(BuildContext context, String imageUrl) {
   showDialog(
     barrierDismissible: true,
@@ -308,7 +309,8 @@ void _showAvatarDetail(BuildContext context, String imageUrl) {
             // Centered avatar image
             Center(
               child: CircleAvatar(
-                radius: MediaQuery.of(context).size.width * 0.4, // Adjust the radius
+                radius: MediaQuery.of(context).size.width *
+                    0.4, // Adjust the radius
                 backgroundColor: Colors.transparent, // Transparent background
                 child: ClipOval(
                   child: CachedNetworkImage(
@@ -330,4 +332,3 @@ void _showAvatarDetail(BuildContext context, String imageUrl) {
     },
   );
 }
-

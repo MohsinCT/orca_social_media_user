@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orca_social_media/constants/images.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/image_picker_provider.dart';
 import 'package:orca_social_media/view/screens/mobile/starting_page_screens/login_screen.dart';
@@ -29,7 +30,12 @@ class _SignUpMobileState extends State<SignUpMobile> {
     final mediaQuery = MediaQueryHelper(context);
     final imagePickerProvider = Provider.of<ImagePickerProvider>(context);
     return Scaffold(
-      appBar: const CustomAppbar(),
+      appBar: CustomAppbar(
+        title: Image.asset(
+          AppImages.orcaLogoTrans,
+          height: 60,
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -99,14 +105,12 @@ class _SignUpMobileState extends State<SignUpMobile> {
                               top: mediaQuery.screenHeight * 0.01,
                             ),
                             child: GoogleSignUp(
-                                onTap: () {
-                                  
-                                }, text: 'Sign up with Google'),
+                                onTap: () {}, text: 'Sign up with Google'),
                           ),
                           CustonTextLogin(
                             onPressed: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (ctx) =>  LoginScreen()));
+                                  builder: (ctx) => LoginScreen()));
                             },
                           )
                         ],

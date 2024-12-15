@@ -4,10 +4,12 @@ import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/auth_provider.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/fetch_datas_controller.dart';
+import 'package:orca_social_media/controllers/follow_button_controller.dart';
 import 'package:orca_social_media/controllers/forgot_password_controller.dart';
 import 'package:orca_social_media/controllers/image_picker_provider.dart';
 import 'package:orca_social_media/controllers/login_provider.dart';
 import 'package:orca_social_media/controllers/login_shared_prefs.dart';
+import 'package:orca_social_media/controllers/media_provider.dart';
 import 'package:orca_social_media/controllers/navigation_provider.dart';
 import 'package:orca_social_media/controllers/search_controller.dart';
 import 'package:orca_social_media/controllers/tab_bar_controller.dart';
@@ -19,7 +21,7 @@ import 'package:orca_social_media/view/screens/mobile_or_web/sign_up.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
- void main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -51,14 +53,17 @@ class MyApplication extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LoginProvider()),
         ChangeNotifierProvider(create: (_) => PageControllerProvider()),
         ChangeNotifierProvider(create: (_) => ForgotPassController()),
-        ChangeNotifierProvider(create: (_) => FetchUpcomingCourses())
+        ChangeNotifierProvider(create: (_) => FetchUpcomingCourses()),
+        ChangeNotifierProvider(create: (_) => FollowProvider()),
+        ChangeNotifierProvider(create: (_) => MediaProvider()),
+        ChangeNotifierProvider(create: (_) => FollowProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           scaffoldBackgroundColor: AppColors.oRwhite,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
+          appBarTheme:  AppBarTheme(
+            backgroundColor: AppColors.oRwhite,
             iconTheme: IconThemeData(color: AppColors.oRBlack),
             elevation: 0,
             titleTextStyle: TextStyle(

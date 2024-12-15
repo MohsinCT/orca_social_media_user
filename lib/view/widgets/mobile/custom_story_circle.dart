@@ -4,11 +4,22 @@ import 'package:orca_social_media/constants/media_query.dart';
 
 // ignore: must_be_immutable
 class StoryCircle extends StatelessWidget {
-  List<String> circleItems;
-  StoryCircle({super.key, required this.circleItems});
+  StoryCircle({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final List<String> circleItems = [
+      'Your Story',
+      'Jane Smith',
+      'Alice Johnson',
+      'Michael Brown',
+      'Chris Lee',
+      'Emma Davis',
+      'David Wilson'
+    ];
+
     final mediaQuery = MediaQueryHelper(context);
     return SizedBox(
       height: mediaQuery.screenHeight * 0.15,

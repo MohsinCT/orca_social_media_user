@@ -29,7 +29,7 @@ class GetStarted extends StatelessWidget {
             height: mediaQuery.screenHeight * 0.12,
           ),
           const Text(
-            'Some Quote goes Here',
+            '"Empowering your journey,\none career step at a time."',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           SizedBox(

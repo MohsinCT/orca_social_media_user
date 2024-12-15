@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/colors.dart';
-import 'package:orca_social_media/constants/images.dart';
 import 'package:orca_social_media/controllers/navigation_provider.dart';
 import 'package:orca_social_media/view/screens/mobile/academy_screen/academy.dart';
 import 'package:orca_social_media/view/screens/mobile/chat_bot_screen/chat_bot.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/home_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/network_screen/network.dart';
+import 'package:orca_social_media/view/screens/mobile/post_screen/post_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/profile_screen/user_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class BottomNavScreen extends StatelessWidget {
-  final List<Widget> _screens =  [
+  final List<Widget> _screens = [
     HomeScreen(),
     NetworkScreen(),
     ChatBotScreen(),
@@ -19,14 +19,64 @@ class BottomNavScreen extends StatelessWidget {
     ProfileScreen()
   ];
 
-   BottomNavScreen({super.key});
+  BottomNavScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody:
           true, // Enables the body to extend behind the bottom navigation bar
-      floatingActionButton: FloatingActionButton(onPressed: () {}),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(
+                                builder: (context) => PostScreen()))
+                            .then(Navigator.of(context).pop);
+                      },
+                      child: Text(
+                        'Share Post',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                    Divider(), // Divider between buttons
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Close the dialog
+                        // Add message logic here
+                      },
+                      child: Text(
+                        'Share Message',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+        child: Icon(Icons.add),
+      ),
+
       body: Consumer<NavigationProvider>(
         builder: (context, provider, child) {
           return _screens[provider.currentIndex];
@@ -84,23 +134,4 @@ class BottomNavScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNavImg(String img, String label, bool isSelected) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset(
-          img,
-          width: 100,
-          height: 50,
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.black : AppColors.oRwhite,
-            fontSize: 11, // Adjust the font size as needed
-          ),
-        ),
-      ],
-    );
-  }
 }

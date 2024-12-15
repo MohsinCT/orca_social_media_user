@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/bottom_nav_screen.dart';
 import 'package:orca_social_media/constants/media_query.dart';
@@ -11,7 +10,8 @@ import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class CustomButton extends StatelessWidget {
-  final Widget buttonText; // Accept any widget, including Text or CircularProgressIndicator
+  final Widget
+      buttonText; // Accept any widget, including Text or CircularProgressIndicator
   final VoidCallback? onPressed;
 
   const CustomButton({
@@ -25,7 +25,7 @@ class CustomButton extends StatelessWidget {
     final mediaQuery = MediaQueryHelper(context);
     return Flexible(
       child: SizedBox(
-        width:mediaQuery.screenWidth * 0.8 ,
+        width: mediaQuery.screenWidth * 0.8,
         height: mediaQuery.screenHeight * 0.06,
         child: ElevatedButton(
           onPressed: onPressed,
@@ -35,7 +35,8 @@ class CustomButton extends StatelessWidget {
             minimumSize: const Size(double.infinity, 50),
             elevation: 2,
           ),
-          child: buttonText, // Render the passed widget (can be Text or anything else)
+          child:
+              buttonText, // Render the passed widget (can be Text or anything else)
         ),
       ),
     );
@@ -50,11 +51,12 @@ class SignUpButton extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
   final image;
 
-  SignUpButton({super.key, 
+  SignUpButton({
+    super.key,
     required this.formKey,
     required this.usernameController,
     required this.emailController,
-    required this.passwordController, 
+    required this.passwordController,
     required this.image,
   });
 
@@ -73,11 +75,10 @@ class SignUpButton extends StatelessWidget {
                     try {
                       await Provider.of<UserProvider>(context, listen: false)
                           .registerUser(
-                        username: usernameController.text,
-                        email: emailController.text,
-                        password: passwordController.text,
-                        profilPicture: image,
-                      );
+                              username: usernameController.text,
+                              email: emailController.text,
+                              password: passwordController.text,
+                              profilPicture: image);
 
                       loginSharedPrefs.setLoginStatus(true);
 
@@ -87,10 +88,8 @@ class SignUpButton extends StatelessWidget {
                       );
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                            builder: (ctx) =>  BottomNavScreen()),
+                        MaterialPageRoute(builder: (ctx) => BottomNavScreen()),
                       );
-                       Provider.of<UserProvider>(context, listen: false).resetImage(image);
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Error: $e')),
@@ -115,4 +114,3 @@ class SignUpButton extends StatelessWidget {
     );
   }
 }
-

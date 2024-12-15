@@ -4,37 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/models/register_model.dart';
+import 'package:orca_social_media/view/widgets/mobile/custom_appbar.dart';
 import 'package:provider/provider.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_password_field.dart';
 
-class EditProfile extends StatefulWidget {
+class EditProfile extends StatelessWidget {
   final UserModel user;
+
   const EditProfile({super.key, required this.user});
 
-  @override
-  _EditProfileState createState() => _EditProfileState();
-}
-
-class _EditProfileState extends State<EditProfile> {
-  late TextEditingController nickNameController;
-  late TextEditingController userNameController;
-  late TextEditingController bioController;
-  late TextEditingController locationController;
-  @override
-  void initState() {
-    super.initState();
-    _initializeControllers();
-  }
-
-  void _initializeControllers() {
-    nickNameController = TextEditingController(text: widget.user.nickname);
-    userNameController = TextEditingController(text: widget.user.username);
-    bioController = TextEditingController(text: widget.user.bio);
-    locationController = TextEditingController(text: widget.user.location);
-  }
-
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(BuildContext context) async {
     final pickedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
@@ -43,7 +23,16 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-  Future<void> _saveProfile() async {
+  Future<void> _takeImage(BuildContext context) async {
+    final pickedImage =
+        await ImagePicker().pickImage(source: ImageSource.camera);
+    if (pickedImage != null) {
+      Provider.of<UserProvider>(context, listen: false)
+          .setProfileImage(File(pickedImage.path));
+    }
+  }
+
+  Future<void> _saveProfile(BuildContext context, TextEditingController userNameController, TextEditingController bioController, TextEditingController nickNameController, TextEditingController locationController) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     try {
       await userProvider.editUserProfile(
@@ -67,12 +56,16 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
 
+    final nickNameController = TextEditingController(text: user.nickname);
+    final userNameController = TextEditingController(text: user.username);
+    final bioController = TextEditingController(text: user.bio);
+    final locationController = TextEditingController(text: user.location);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Profile'),
-        centerTitle: true,
-        elevation: 0,
-      ),
+      appBar:CustomAppbar(
+        title: Text('Edit Profile'),
+        automaticallyImplyleading: true,
+        ),
       body: Consumer<UserProvider>(
         builder: (context, userProvider, child) {
           return SingleChildScrollView(
@@ -88,15 +81,9 @@ class _EditProfileState extends State<EditProfile> {
                         children: [
                           CircleAvatar(
                             radius: 60,
-                            backgroundImage: Provider.of<UserProvider>(context,
-                                            listen: false)
-                                        .profileImage !=
-                                    null
-                                ? FileImage(Provider.of<UserProvider>(context,
-                                        listen: false)
-                                    .profileImage!)
-                                : NetworkImage(widget.user.profilPicture)
-                                    as ImageProvider,
+                            backgroundImage: userProvider.profileImage != null
+                                ? FileImage(userProvider.profileImage!)
+                                : NetworkImage(user.profilPicture) as ImageProvider,
                           ),
                           Positioned(
                             bottom: 0,
@@ -110,7 +97,7 @@ class _EditProfileState extends State<EditProfile> {
                                   size: 18,
                                   color: Colors.white,
                                 ),
-                                onPressed: _pickImage,
+                                onPressed: () => _pickImage(context),
                               ),
                             ),
                           ),
@@ -118,7 +105,37 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       const SizedBox(height: 10),
                       ElevatedButton(
-                        onPressed: _pickImage,
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Choose an option'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      leading: const Icon(Icons.photo_library),
+                                      title: const Text('Pick Image from Gallery'),
+                                      onTap: () {
+                                        _pickImage(context);
+                                        Navigator.of(context).pop(); // Close the dialog
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.camera_alt),
+                                      title: const Text('Take Photo'),
+                                      onTap: () {
+                                        _takeImage(context);
+                                        Navigator.of(context).pop(); // Close the dialog
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).primaryColor,
                           shape: RoundedRectangleBorder(
@@ -174,7 +191,13 @@ class _EditProfileState extends State<EditProfile> {
                     horizontal: mediaQuery.screenWidth * 0.05,
                   ),
                   child: ElevatedButton(
-                    onPressed: _saveProfile,
+                    onPressed: () => _saveProfile(
+                      context,
+                      userNameController,
+                      bioController,
+                      nickNameController,
+                      locationController,
+                    ),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         vertical: 14,

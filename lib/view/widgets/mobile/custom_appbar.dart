@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 
-import '../../../constants/images.dart';
+
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppbar({super.key});
+  final IconButton? leading;
+  final dynamic title;
+  final List<Widget> ? actions;
+  final bool? centerTitle;
+  final bool  automaticallyImplyleading;
+  const CustomAppbar({super.key,  required this.title, this.leading, this.actions, this.centerTitle, this.automaticallyImplyleading = false,});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      elevation: 6,
-      centerTitle: true,
-      title: Image.asset(
-        AppImages.orcaLogoTrans,
-        height: 60,
-      ),
+      automaticallyImplyLeading: automaticallyImplyleading ,
+      elevation: 20,
+      centerTitle: centerTitle,
+      title: title,
+      actions: actions,
     );
   }
 
