@@ -1,18 +1,29 @@
+import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/media_provider.dart';
+
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
-class PostScreen extends StatelessWidget {
-  const PostScreen({super.key});
+class PostScreen extends StatefulWidget {
+  final String? userId;
+  PostScreen({super.key, required this.userId});
+
+  @override
+  State<PostScreen> createState() => _PostScreenState();
+}
+
+class _PostScreenState extends State<PostScreen> {
+  final TextEditingController _captionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
     final postProvider = Provider.of<MediaProvider>(context, listen: false);
+
+  
 
     return Scaffold(
       appBar: AppBar(
@@ -34,10 +45,13 @@ class PostScreen extends StatelessWidget {
               // Media Preview
               Consumer<MediaProvider>(
                 builder: (context, provider, child) {
-                  if (provider.selectedVideo != null && provider.videoPlayerController != null) {
+                  if (provider.selectedVideo != null &&
+                      provider.videoPlayerController != null) {
                     // Video Preview
                     return AspectRatio(
-                      aspectRatio: provider.videoPlayerController?.value.aspectRatio ?? 16 / 9,
+                      aspectRatio:
+                          provider.videoPlayerController?.value.aspectRatio ??
+                              16 / 9,
                       child: VideoPlayer(provider.videoPlayerController!),
                     );
                   } else if (provider.croppedImage != null) {
@@ -158,6 +172,7 @@ class PostScreen extends StatelessWidget {
 
               // Caption Input
               TextFormField(
+                controller: _captionController,
                 maxLines: 3,
                 decoration: InputDecoration(
                   labelText: 'Write a Caption...',
@@ -184,8 +199,32 @@ class PostScreen extends StatelessWidget {
               // Share Button
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Share post logic here
+                  onPressed: () async {
+                    try{
+
+                      String  userId = widget.userId ?? '';
+                    if (postProvider.selectedImage == null &&
+                        postProvider.selectedVideo == null &&
+                        _captionController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please fill missing fields'),
+                        ),
+                      );
+                      return;
+                    }
+                    await postProvider.uploadMediaAndCreatePost(
+                      context: context, 
+                      userId: userId, 
+                      captionController: _captionController);
+
+                    }catch (e){
+                      log('failed to add a new post $e');
+
+                    }
+                    
+
+                  
                   },
                   child: const Text('Share'),
                 ),
@@ -197,3 +236,4 @@ class PostScreen extends StatelessWidget {
     );
   }
 }
+

@@ -35,6 +35,7 @@ class _SignUpMobileState extends State<SignUpMobile> {
           AppImages.orcaLogoTrans,
           height: 60,
         ),
+        centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

@@ -32,8 +32,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool isGooglePressed = true;
 
- 
-
   @override
   Widget build(BuildContext context) {
     final loginPrefs = Provider.of<LoginSharedPrefs>(context);
@@ -41,106 +39,104 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar:  CustomAppbar(title: Image.asset(
-        AppImages.orcaLogoTrans,
-        height: 60,
-      ),
+      appBar: CustomAppbar(
+        title: Image.asset(
+          AppImages.orcaLogoTrans,
+          height: 60,
+        ),
+        centerTitle: true,
       ),
       body: Consumer<LoginProvider>(
-        builder: (context, loginProvider, child) => 
-      
-           GestureDetector(
-            onTap: (){
-              FocusScope.of(context).unfocus();
-            },
-             child: SafeArea(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  vertical: mediaQuery.screenHeight * 0.05,
-                  horizontal: mediaQuery.screenWidth * 0.05,
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: mediaQuery.screenWidth * 0.07,
-                        top: mediaQuery.screenHeight * 0.13,
-                      ),
-                      child: const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Log in',
-                          style: TextStyle(
-                            fontSize: 27,
-                            fontWeight: FontWeight.bold,
-                          ),
+        builder: (context, loginProvider, child) => GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                vertical: mediaQuery.screenHeight * 0.05,
+                horizontal: mediaQuery.screenWidth * 0.05,
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: mediaQuery.screenWidth * 0.07,
+                      top: mediaQuery.screenHeight * 0.13,
+                    ),
+                    child: const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Log in',
+                        style: TextStyle(
+                          fontSize: 27,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: mediaQuery.screenHeight * 0.04,
+                  ),
+                  SizedBox(
+                    height: mediaQuery.screenHeight * 0.04,
+                  ),
+                  LoginForm(
+                      formkey: _formKey,
+                      emailController: loginProvider.emailController,
+                      passwordController: loginProvider.passwordController),
+                  const CustomDivider(),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: mediaQuery.screenHeight * 0.01,
                     ),
-                    LoginForm(
-                        formkey: _formKey,
-                        emailController: loginProvider.emailController,
-                        passwordController: loginProvider.passwordController),
-                    const CustomDivider(),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: mediaQuery.screenHeight * 0.01,
-                      ),
-                      child: GoogleSignUp(
-                        onTap: () {
-                         _signInWithGoogle(context);
-                          loginPrefs.setLoginStatus(true);
-
-                        },
-                        text: 'Sign up with Google',
-                      ),
-                    ),
-                    CustomTextSignup(
-                      onPressed: () {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (ctx) => const SignUpMobile(),
-                          ),
-                        );
+                    child: GoogleSignUp(
+                      onTap: () {
+                        _signInWithGoogle(context);
+                        loginPrefs.setLoginStatus(true);
                       },
+                      text: 'Sign up with Google',
                     ),
-                  ],
-                ),
+                  ),
+                  CustomTextSignup(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (ctx) => const SignUpMobile(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-                       ),
-           ),
-      
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
-Future<void> _signInWithGoogle(BuildContext context)async{
+Future<void> _signInWithGoogle(BuildContext context) async {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  try{
-    final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
+  try {
+    final GoogleSignInAccount? googleSignInAccount =
+        await _googleSignIn.signIn();
 
-    if(googleSignInAccount != null){
-      final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+    if (googleSignInAccount != null) {
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleSignInAuthentication.idToken,
         accessToken: googleSignInAuthentication.accessToken,
       );
-       final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
       await firebaseAuth.signInWithCredential(credential);
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => BottomNavScreen()));
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => BottomNavScreen()));
     }
-
-  } catch(e){
+  } catch (e) {
     log('$e');
-
   }
 }
-
 
 // void _login(String email, String password, BuildContext context) async {
 //   AuthProviderState _authState =

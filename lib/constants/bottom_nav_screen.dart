@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/colors.dart';
+import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/navigation_provider.dart';
 import 'package:orca_social_media/view/screens/mobile/academy_screen/academy.dart';
 import 'package:orca_social_media/view/screens/mobile/chat_bot_screen/chat_bot.dart';
@@ -23,6 +24,8 @@ class BottomNavScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context , listen: false);
+    final userId = userProvider.userId;
     return Scaffold(
       extendBody:
           true, // Enables the body to extend behind the bottom navigation bar
@@ -41,10 +44,10 @@ class BottomNavScreen extends StatelessWidget {
                   children: [
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(
-                                builder: (context) => PostScreen()))
-                            .then(Navigator.of(context).pop);
+                        // Navigator.of(context)
+                        //     .push(MaterialPageRoute(
+                        //         builder: (context) => PostScreen(userId: userId,)))
+                        //     .then(Navigator.of(context).pop);
                       },
                       child: Text(
                         'Share Post',

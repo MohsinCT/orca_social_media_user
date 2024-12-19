@@ -1,13 +1,16 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
+import 'package:orca_social_media/models/post_model.dart';
 import 'package:orca_social_media/models/register_model.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_appbar.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_user_shimmer.dart';
 import 'package:orca_social_media/view/widgets/mobile/users_details.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class UserProfile extends StatelessWidget {
   final String userId;
@@ -23,9 +26,8 @@ class UserProfile extends StatelessWidget {
   ];
 
   Future<void> _handleRefresh(BuildContext context) async {
-   Provider.of<UserProvider>(context, listen: false);
- 
-}
+    Provider.of<UserProvider>(context, listen: false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,21 +40,17 @@ class UserProfile extends StatelessWidget {
         appBar: CustomAppbar(
           automaticallyImplyleading: true,
           title: FutureBuilder<UserModel>(
-            future: userProvider.fetchUserById(userId), 
-            builder: (context , snapshot){
-              if(snapshot.connectionState == ConnectionState.waiting){
-                return LinearProgressIndicator();
-              } else if (snapshot.hasError || snapshot.data == null){
-                return Text('Orca user');
-              }
-              final user = snapshot.data!;
-              return Text(user.username);
-            }),
-            actions: [
-              IconButton(onPressed: (){
-
-              }, icon: Icon(Icons.more_vert))
-            ],
+              future: userProvider.fetchUserById(userId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return LinearProgressIndicator();
+                } else if (snapshot.hasError || snapshot.data == null) {
+                  return Text('Orca user');
+                }
+                final user = snapshot.data!;
+                return Text(user.username);
+              }),
+          actions: [IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
         ),
         body: LiquidPullToRefresh(
           color: AppColors.oRBlack,
@@ -106,35 +104,88 @@ class UserProfile extends StatelessWidget {
                             SizedBox(
                               height: mediaQuery.screenHeight * 0.74,
                               child: TabBarView(children: [
-                                GridView.builder(
-                                  padding: const EdgeInsets.all(10),
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        3, // Number of items in a row
-                                    mainAxisSpacing:
-                                        10.0, // Vertical space between grid items
-                                    crossAxisSpacing:
-                                        4.0, // Horizontal space between grid items
-                                    childAspectRatio:
-                                        1.0, // Aspect ratio of each item
-                                  ),
-                                  // Disable GridView scrolling
-                                  shrinkWrap:
-                                      true, // Make GridView take only the necessary height
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
+                                FutureBuilder<List<PostModel>>(
+                                  future: Provider.of<UserProvider>(context,
+                                          listen: false)
+                                      .fetchPostsByUserId(userId),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(child: CircularProgressIndicator());
+                                    } else if (snapshot.hasError) {
+                                      return Center(
+                                        child: Text('Error: ${snapshot.error}'),
+                                      );
+                                    } else if (!snapshot.hasData ||
+                                        snapshot.data!.isEmpty) {
+                                      return Center(
+                                        child: Text('No posts Available'),
+                                      );
+                                    }
+
+                                    final posts = snapshot.data!;
+                                    return GridView.builder(
+                                      padding: const EdgeInsets.all(10),
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3,
+                                        mainAxisSpacing: 10.0,
+                                        crossAxisSpacing: 4.0,
+                                        childAspectRatio: 1.0,
                                       ),
-                                      child: Image.asset(
-                                        'assets/Credit card.jpg',
-                                        fit: BoxFit.cover,
-                                      ),
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        final post = posts[index];
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            border:
+                                                Border.all(color: Colors.grey),
+                                          ),
+                                          child: post.image.isNotEmpty
+                                              ? ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: post.image,
+                                                    fit: BoxFit.cover,
+                                                    width: double.infinity,
+                                                    height: double.infinity,
+                                                    placeholder:
+                                                        (context, url) =>
+                                                            Shimmer.fromColors(
+                                                      baseColor:
+                                                          Colors.grey[300]!,
+                                                      highlightColor:
+                                                          Colors.grey[100]!,
+                                                      child: Container(
+                                                        color: Colors.grey,
+                                                        width: double.infinity,
+                                                        height: double.infinity,
+                                                      ),
+                                                    ),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            const Center(
+                                                      child: Icon(Icons.error,
+                                                          color: Colors.red),
+                                                    ),
+                                                  ),
+                                                )
+                                              : post.video.isNotEmpty
+                                                  ? const Icon(
+                                                      Icons.video_library,
+                                                      color: Colors.grey,
+                                                    )
+                                                  : const Center(
+                                                      child: Text('No Media'),
+                                                    ),
+                                        );
+                                      },
+                                      itemCount: posts.length,
                                     );
                                   },
-                                  itemCount:
-                                      9, // Set the total number of items here
                                 ),
                               ]),
                             )
@@ -151,8 +202,4 @@ class UserProfile extends StatelessWidget {
       ),
     );
   }
-  
 }
-
-
-

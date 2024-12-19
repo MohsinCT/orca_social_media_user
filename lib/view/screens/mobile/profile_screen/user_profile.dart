@@ -4,7 +4,9 @@ import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/navigation_provider.dart';
+import 'package:orca_social_media/view/screens/mobile/post_screen/post_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/profile_screen/settings_screen.dart';
+import 'package:orca_social_media/view/screens/mobile/profile_screen/user_post_show_dialog.dart';
 import 'package:orca_social_media/view/screens/mobile/profile_screen/user_posts.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_appbar.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_user_details.dart';
@@ -21,6 +23,8 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
+    final userProvider = Provider.of<UserProvider>(context , listen:  false);
+    String? currentUser = userProvider.getLoggedUserId();
 
     return DefaultTabController(
       length: tabNames.length,
@@ -28,6 +32,24 @@ class ProfileScreen extends StatelessWidget {
         appBar: CustomAppbar(
           title: Text('Profile'),
           actions: [
+            IconButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (_) => PostDialog(
+                          sharePost: 'Share post',
+                          shareMessage: 'Share message',
+                          shareStory: 'Share story',
+                          sharePosts: (){
+                             Navigator.of(context)
+                            .push(MaterialPageRoute(
+                                builder: (context) => PostScreen(userId: currentUser,)))
+                            .then(Navigator.of(context).pop);
+                          },
+                          shareMessages: (){},
+                          shareStories: (){}));
+                },
+                icon: Icon(Icons.add)),
             IconButton(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(

@@ -1,3 +1,4 @@
+
 import 'dart:developer';
 import 'dart:io';
 
@@ -21,6 +22,14 @@ class UserProvider with ChangeNotifier {
   UserModel? _user;
   UserModel? get user => _user;
 
+  String? _userId;
+
+  String? get userId => _userId;
+
+ String? getLoggedUserId(){
+  User? user = FirebaseAuth.instance.currentUser;
+  return user?.uid;
+ }
   
 
   //--------------------------------FetchSingleUser------------------------------------//
@@ -274,6 +283,25 @@ class UserProvider with ChangeNotifier {
       return [];
     }
   }
+
+  Future<List<PostModel>> fetchPostsByUserId(String userId) async {
+  try {
+    QuerySnapshot querySnapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('posts')
+        .orderBy('date', descending: true)
+        .get();
+
+    return querySnapshot.docs
+        .map((doc) => PostModel.fromMap(doc.data() as Map<String, dynamic>))
+        .toList();
+  } catch (e) {
+    log('Error fetching posts for user $userId: $e');
+    return [];
+  }
+}
+
 
   // Future<void> addPost({
   //   required String caption,
