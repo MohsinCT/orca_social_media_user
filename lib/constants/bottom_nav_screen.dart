@@ -29,56 +29,6 @@ class BottomNavScreen extends StatelessWidget {
     return Scaffold(
       extendBody:
           true, // Enables the body to extend behind the bottom navigation bar
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) => Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        // Navigator.of(context)
-                        //     .push(MaterialPageRoute(
-                        //         builder: (context) => PostScreen(userId: userId,)))
-                        //     .then(Navigator.of(context).pop);
-                      },
-                      child: Text(
-                        'Share Post',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ),
-                    Divider(), // Divider between buttons
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context); // Close the dialog
-                        // Add message logic here
-                      },
-                      child: Text(
-                        'Share Message',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-        child: Icon(Icons.add),
-      ),
 
       body: Consumer<NavigationProvider>(
         builder: (context, provider, child) {

@@ -1,6 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
+import 'package:orca_social_media/controllers/auth/register.dart';
+import 'package:orca_social_media/models/register_model.dart';
+import 'package:orca_social_media/view/screens/mobile/home_screen/story_screen.dart';
+import 'package:orca_social_media/view/screens/mobile/home_screen/users_story_screen.dart';
+import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class StoryCircle extends StatelessWidget {
@@ -10,41 +16,65 @@ class StoryCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> circleItems = [
-      'Your Story',
-      'Jane Smith',
-      'Alice Johnson',
-      'Michael Brown',
-      'Chris Lee',
-      'Emma Davis',
-      'David Wilson'
-    ];
-
     final mediaQuery = MediaQueryHelper(context);
+    final userProvier = Provider.of<UserProvider>(context, listen: false);
+    String? currentUser = userProvier.getLoggedUserId();
+
     return SizedBox(
       height: mediaQuery.screenHeight * 0.15,
-      child: ListView.builder(
-        itemCount: circleItems.length,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: EdgeInsets.only(left: mediaQuery.screenWidth * 0.03),
-            child: Column(
-              children: [
-                // Check if it's the first item
-                index == 0
-                    ? GestureDetector(
-                        onTap: () {},
+      child: FutureBuilder<List<dynamic>>(
+        future: Future.wait([
+          Provider.of<UserProvider>(context, listen: false).fetchUserDetails(),
+          Provider.of<UserProvider>(context, listen: false).fetchAllUsers(),
+        ]),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: Text('Loading...'),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text('No Stories'),
+            );
+          }
+
+          final userData = snapshot.data![0] as UserModel;
+          final allUsers = snapshot.data![1] as List<UserModel>;
+
+          return ListView.builder(
+            itemCount: allUsers.length, // +1 for the current user story
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                // Display the current user's story
+                return Padding(
+                  padding: EdgeInsets.only(left: mediaQuery.screenWidth * 0.03),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => StoryScreen(
+                                    userId: currentUser,
+                                  )));
+                        },
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
                             Container(
                               width: mediaQuery.screenWidth * 0.22,
                               height: mediaQuery.screenHeight * 0.1,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.oRLightGrey,
-                              ),
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColors.oRLightGrey,
+                                  image: DecorationImage(
+                                      image: CachedNetworkImageProvider(
+                                          userData.profilPicture),
+                                      fit: BoxFit.cover)),
                             ),
                             Positioned(
                               right: mediaQuery.screenWidth * 0.01,
@@ -65,28 +95,62 @@ class StoryCircle extends StatelessWidget {
                             ),
                           ],
                         ),
-                      )
-                    : Container(
-                        width: mediaQuery.screenWidth * 0.22,
-                        height: mediaQuery.screenHeight * 0.1,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.oRBlack,
+                      ),
+                      SizedBox(
+                        height: mediaQuery.screenHeight * 0.01,
+                      ),
+                      Text(
+                        'Your Story', // Display the current user's name
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                // Display all other users' stories
+                final allusers = allUsers[index];
+                return Padding(
+                  padding: EdgeInsets.only(left: mediaQuery.screenWidth * 0.03),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => UsersStories(userId: allusers.id,)));
+                        },
+                        child: Container(
+                          width: mediaQuery.screenWidth * 0.22,
+                          height: mediaQuery.screenHeight * 0.1,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.oRBlack,
+                              image: DecorationImage(
+                                image: CachedNetworkImageProvider(
+                                    allusers.profilPicture),
+                                fit: BoxFit.cover,
+                              )),
                         ),
                       ),
-                SizedBox(
-                  height: mediaQuery.screenHeight * 0.01,
-                ), // Space between circle and text
-                Text(
-                  circleItems[index], // Display the name under the circle
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                      SizedBox(
+                        height: mediaQuery.screenHeight * 0.01,
+                      ),
+                      Text(
+                        allusers.username,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+                );
+              }
+            },
           );
         },
       ),

@@ -25,10 +25,10 @@ class MediaProvider extends ChangeNotifier {
   XFile? get selectedVideo => _selectedVideo;
   VideoPlayerController? get videoPlayerController => _videoPlayerController;
 
-  Future<void> pickImage(bool pickGalleryImage) async {
+  Future<void> pickImage(bool pickImage) async {
     try {
       _selectedImage = await picker.pickImage(
-        source: pickGalleryImage ? ImageSource.gallery : ImageSource.camera,
+        source: pickImage ? ImageSource.gallery : ImageSource.camera,
       );
 
       if (_selectedImage != null) {

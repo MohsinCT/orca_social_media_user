@@ -12,6 +12,8 @@ import 'package:orca_social_media/controllers/login_shared_prefs.dart';
 import 'package:orca_social_media/controllers/media_provider.dart';
 import 'package:orca_social_media/controllers/navigation_provider.dart';
 import 'package:orca_social_media/controllers/search_controller.dart';
+import 'package:orca_social_media/controllers/story_controller.dart';
+import 'package:orca_social_media/controllers/story_state_controller.dart';
 import 'package:orca_social_media/controllers/tab_bar_controller.dart';
 import 'package:orca_social_media/controllers/textfield_provider.dart';
 import 'package:orca_social_media/firebase_options.dart';
@@ -57,6 +59,8 @@ class MyApplication extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FollowProvider()),
         ChangeNotifierProvider(create: (_) => MediaProvider()),
         ChangeNotifierProvider(create: (_) => FollowProvider()),
+        ChangeNotifierProvider(create: (_) => StoryProvider()),
+        ProxyProvider<TickerProvider , StoryStateController>(update: (_,vsync,__) =>StoryStateController(vsync))
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -4,6 +4,7 @@ import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/navigation_provider.dart';
+import 'package:orca_social_media/view/screens/mobile/home_screen/add_story.dart';
 import 'package:orca_social_media/view/screens/mobile/post_screen/post_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/profile_screen/settings_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/profile_screen/user_post_show_dialog.dart';
@@ -47,7 +48,9 @@ class ProfileScreen extends StatelessWidget {
                             .then(Navigator.of(context).pop);
                           },
                           shareMessages: (){},
-                          shareStories: (){}));
+                          shareStories: (){
+                            Navigator.of(context).push(MaterialPageRoute(builder: (_) => StoryAddingPage(userId: currentUser,)));
+                          }));
                 },
                 icon: Icon(Icons.add)),
             IconButton(
