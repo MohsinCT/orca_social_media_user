@@ -1,29 +1,30 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:orca_social_media/models/post_model.dart';
+import 'package:orca_social_media/models/register_model.dart';
 import 'package:uuid/uuid.dart';
-import 'package:video_player/video_player.dart';
 
 class MediaProvider extends ChangeNotifier {
-  final picker = ImagePicker();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  final picker = ImagePicker();
   XFile? _selectedImage;
   CroppedFile? _croppedImage;
-  XFile? _selectedVideo;
-  VideoPlayerController? _videoPlayerController;
 
   XFile? get selectedImage => _selectedImage;
   CroppedFile? get croppedImage => _croppedImage;
-  XFile? get selectedVideo => _selectedVideo;
-  VideoPlayerController? get videoPlayerController => _videoPlayerController;
 
   Future<void> pickImage(bool pickImage) async {
     try {
@@ -34,11 +35,6 @@ class MediaProvider extends ChangeNotifier {
       if (_selectedImage != null) {
         await cropImage(_selectedImage!);
       }
-
-      // Clear video-related data
-      _selectedVideo = null;
-      _videoPlayerController?.dispose();
-      _videoPlayerController = null;
 
       notifyListeners();
     } catch (e) {
@@ -72,32 +68,6 @@ class MediaProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> pickVideo(bool pickGalleryVideo) async {
-    try {
-      _selectedVideo = await picker.pickVideo(
-        source: pickGalleryVideo ? ImageSource.gallery : ImageSource.camera,
-      );
-
-      // Clear image-related data
-      _selectedImage = null;
-      _croppedImage = null;
-
-      if (_selectedVideo != null) {
-        _videoPlayerController = VideoPlayerController.file(File(_selectedVideo!.path))
-          ..initialize().then((_) {
-            notifyListeners();
-          });
-      } else {
-        _videoPlayerController?.dispose();
-        _videoPlayerController = null;
-      }
-
-      notifyListeners();
-    } catch (e) {
-      log('Error picking video: $e');
-    }
-  }
-
   Future<void> uploadMediaAndCreatePost({
     required BuildContext context,
     required String userId,
@@ -110,9 +80,6 @@ class MediaProvider extends ChangeNotifier {
     }
 
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Uploading media...")));
-
       final fileName = const Uuid().v4();
       final storageRef = FirebaseStorage.instance
           .ref()
@@ -124,10 +91,11 @@ class MediaProvider extends ChangeNotifier {
 
       final newPost = PostModel(
         id: fileName,
+        userId: userId,
         image: mediaUrl,
-        video: '',
         caption: captionController.text.trim(),
         date: DateFormat('MMM,d,yyyy').format(DateTime.now()),
+        likedUsers: [],
       );
 
       await createPost(userId, newPost.toMap());
@@ -140,40 +108,37 @@ class MediaProvider extends ChangeNotifier {
       captionController.clear();
     } catch (e) {
       log('Error uploading media: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error uploading media: $e")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error uploading media: $e")));
     }
   }
 
   void resetMedia() {
     _selectedImage = null;
     _croppedImage = null;
-    _selectedVideo = null;
-    _videoPlayerController?.dispose();
-    _videoPlayerController = null;
     notifyListeners();
   }
 
- Future<void> createPost(String userId, Map<String, dynamic> post) async {
-  if (userId.isEmpty) {
-    log('Error: userId is empty or null');
-    return;
-  }
+  Future<void> createPost(String userId, Map<String, dynamic> post) async {
+    if (userId.isEmpty) {
+      log('Error: userId is empty or null');
+      return;
+    }
 
-  try {
-    final userDocRef = _firestore.collection('users').doc(userId);
-    await userDocRef.collection('posts').add(post);
-    log('Post added successfully!');
-  } catch (e) {
-    log('Failed to add post: $e');
+    try {
+      final userDocRef = _firestore.collection('users').doc(userId);
+      await userDocRef.collection('posts').add(post);
+      log('Post added successfully!');
+    } catch (e) {
+      log('Failed to add post: $e');
+    }
   }
-}
-
 
   Future<List<PostModel>> fetchPosts(String userId) async {
     try {
       final userDocRef = _firestore.collection('users').doc(userId);
-      final QuerySnapshot postSnapshot = await userDocRef.collection('posts').get();
+      final QuerySnapshot postSnapshot =
+          await userDocRef.collection('posts').get();
 
       final posts = postSnapshot.docs.map((doc) {
         return PostModel.fromMap(doc.data() as Map<String, dynamic>);
@@ -187,30 +152,197 @@ class MediaProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updatePost(String userId, String postId, Map<String, dynamic> updatedData) async {
-    try {
-      final userDocRef = _firestore.collection('users').doc(userId);
-      await userDocRef.collection('posts').doc(postId).update(updatedData);
-      log('Post updated successfully!');
-    } catch (e) {
-      log('Failed to update post: $e');
+  Future<void> updatePostCaption(String postId, String newCaption) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      final postRef = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('posts')
+          .where('id', isEqualTo: postId)
+          .limit(1)
+          .get();
+      if (postRef != null) {
+        final postUid = postRef.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .collection('posts')
+            .doc(postUid)
+            .update({'caption': newCaption});
+      }
     }
   }
 
-  Future<void> deletePost(String userId, String postId) async {
-    try {
-      final userDocRef = _firestore.collection('users').doc(userId);
-      await userDocRef.collection('posts').doc(postId).delete();
-      log('Post deleted successfully!');
-    } catch (e) {
-      log('Failed to delete post: $e');
+  Future<void> deletePost(String postId) async {
+    log('this is the id  $postId');
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      final postRef = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('posts')
+          .where('id', isEqualTo: postId)
+          .limit(1)
+          .get();
+      if (postRef != null) {
+        final postUid = postRef.docs.first.id;
+        log('this is $postUid');
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .collection('posts')
+            .doc(postUid)
+            .delete();
+      }
     }
   }
+
+  Future<void> refresh() async {
+    await Future.delayed(Duration(seconds: 1));
+    notifyListeners();
+  }
+
+  Future<Map<String, dynamic>?> fetchUserAndPosts() async {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(currentUser.uid).get();
+        if (userDoc.exists) {
+          UserModel userModel =
+              UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
+
+          QuerySnapshot querySnapshot = await _firestore
+              .collection('users')
+              .doc(currentUser.uid)
+              .collection('posts')
+              .orderBy('date', descending: true)
+              .get();
+
+          List<PostModel> posts = querySnapshot.docs
+              .map((doc) =>
+                  PostModel.fromMap(doc.data() as Map<String, dynamic>))
+              .toList();
+          return {'user': userModel, 'posts': posts};
+        }
+      }
+      return null;
+    } catch (e) {
+      log('Error fetching user details and posts : $e');
+      return null;
+    }
+  }
+
+  final List<PostModel> _posts = []; // Store posts
+
+  List<PostModel> get posts => _posts;
+
+  // Function to fetch posts (mock or from Firebase)
+  void fetchlPosts(List<PostModel> fetchedPosts) {
+    _posts.clear();
+    _posts.addAll(fetchedPosts);
+    notifyListeners();
+  }
+
+  List<Map<String, dynamic>> _followingsDataWithPosts = [];
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  List<Map<String, dynamic>> get followingDataWithPosts =>
+      _followingsDataWithPosts;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+
+  Future<void> fetchFollowingsWithLatestPost(String userId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      List<Map<String, dynamic>> followingsDataWithPosts = [];
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      final List<dynamic> followingsIds = userDoc.data()?['followings'] ?? [];
+
+      if (followingsIds.isNotEmpty) {
+        for (String followingsId in followingsIds) {
+          final followingsDoc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(followingsId)
+              .get();
+
+          if (followingsDoc.exists) {
+            // Fetch the latest post for this following user
+            QuerySnapshot postSnapshot = await FirebaseFirestore.instance
+                .collection('users')
+                .doc(followingsId)
+                .collection('posts')
+                .orderBy('date', descending: true)
+                .limit(1)
+                .get();
+
+            Map<String, dynamic> followingData = followingsDoc.data()!;
+
+            // Include the latest post if available
+            if (postSnapshot.docs.isNotEmpty) {
+              followingData['latestPost'] = postSnapshot.docs.first.data();
+            } else {
+              followingData['latestPost'] = null;
+            }
+
+            followingsDataWithPosts.add(followingData);
+          }
+        }
+      }
+
+      _followingsDataWithPosts = followingsDataWithPosts;
+      _isLoading = false;
+    } catch (e) {
+      _errorMessage = 'Error fetching posts: $e';
+      debugPrint('Error fetching followings and latest posts: $e');
+      _isLoading = false;
+    }
+    notifyListeners();
+  } 
+
+  //now modified
+
+  Map<String, bool> postLikeStatus = {};
+
+  bool isPostLiked(String postId) {
+    return postLikeStatus[postId] ?? false;
+  }
+
+  void toggleLike(String postId, String userId) async {
+    bool currentStatus = postLikeStatus[postId] ?? false;
+    postLikeStatus[postId] = !currentStatus;
+    notifyListeners();
+
+    DocumentReference postRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('posts')
+        .doc(postId);
+
+    if (postLikeStatus[postId] == true) {
+      await postRef.update({
+        'likedUsers': FieldValue.arrayUnion([currentUser.email])
+      });
+    } else {
+      await postRef.update({
+        'likedUsers': FieldValue.arrayRemove([currentUser.email])
+      });
+    }
+  }
+
+//
 
   @override
   void dispose() {
     _croppedImage = null;
-    _videoPlayerController?.dispose();
     super.dispose();
   }
 }

@@ -27,7 +27,10 @@ class NetworkScreen extends StatelessWidget {
                   onPressed: () {
                     searchProvider.toggleSearchButtonState();
                   },
-                  icon: Icon(Icons.close))
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.red,
+                  ))
               : IconButton(
                   onPressed: () {
                     searchProvider.toggleSearchButtonState();

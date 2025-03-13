@@ -23,14 +23,16 @@ class StoryScreen extends StatelessWidget {
       body: SafeArea(
         child: ChangeNotifierProvider(
           create: (context) =>
-              StoryStateController(TickerProviderStateMixinImplementation()),
+              StoryStateController(TickerProviderStateMixinImplementation(), context),
           child: Consumer2<StoryStateController, StoryProvider>(
             builder: (context, storyStsProvider, storyProvider, child) {
               final stories = storyProvider.stories;
 
               if (stories.isEmpty) {
                 return const Center(
-                  child: Text('No stories available'),
+                  child: Text('No stories available' ,style: TextStyle(
+                    color: Colors.white
+                  ),),
                 );
               }
               return PageView.builder(
@@ -74,7 +76,7 @@ class StoryScreen extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
-                          'Username',
+                          userProvider.user?.username ?? '',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

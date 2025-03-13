@@ -18,32 +18,32 @@ class AcademyScreen extends StatelessWidget {
       appBar: CustomAppbar(title: Text('Academy')),
       body: Column(
         children: [
-          Padding(
-            padding:
-                EdgeInsets.symmetric(vertical: mediaQuery.screenHeight * 0.02),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black, // Black button
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
-                  side: const BorderSide(color: Colors.white), // White border
-                ),
-              ),
-              onPressed: () {
-                // Handle enrolled courses action
-              },
-              child: const Text(
-                'Enrolled Courses',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white, // White text
-                ),
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding:
+          //       EdgeInsets.symmetric(vertical: mediaQuery.screenHeight * 0.02),
+          //   child: ElevatedButton(
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: Colors.black, // Black button
+          //       padding:
+          //           const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(25),
+          //         side: const BorderSide(color: Colors.white), // White border
+          //       ),
+          //     ),
+          //     onPressed: () {
+          //       // Handle enrolled courses action
+          //     },
+          //     child: const Text(
+          //       'Enrolled Courses',
+          //       style: TextStyle(
+          //         fontSize: 18,
+          //         fontWeight: FontWeight.bold,
+          //         color: Colors.white, // White text
+          //       ),
+          //     ),
+          //   ),
+          // ),
           Expanded(
               child: ChangeNotifierProvider(
             create: (context) => FetchCoursesController(),

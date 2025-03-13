@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 import 'dart:io';
 
@@ -22,17 +21,47 @@ class UserProvider with ChangeNotifier {
   UserModel? _user;
   UserModel? get user => _user;
 
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
   String? _userId;
 
   String? get userId => _userId;
 
- String? getLoggedUserId(){
-  User? user = FirebaseAuth.instance.currentUser;
-  return user?.uid;
+  List<UserModel> _usersList = [];
+  List<UserModel> get usersList => _usersList;
+
+  String? getLoggedUserId() {
+    User? user = FirebaseAuth.instance.currentUser;
+    return user?.uid;
+  }
+
+ UserModel? _currentUserDetails;
+
+ UserModel? get currentUserDetails => _currentUserDetails;
+
+ Future<void> fetchCurrentUserDetails()async{
+  try{
+    User? currentUser = _auth.currentUser;
+    if(currentUser != null){
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(currentUser.uid).get();
+      if(userDoc.exists){
+        _currentUserDetails = UserModel.fromMap(userDoc.data() as Map<String , dynamic>);
+        notifyListeners();
+      } 
+    }
+
+  }catch (e){
+
+  }
  }
-  
+
+
+
 
   //--------------------------------FetchSingleUser------------------------------------//
+
+  UserModel? userDetails;
 
   Future<UserModel?> fetchUserDetails() async {
     try {
@@ -51,6 +80,18 @@ class UserProvider with ChangeNotifier {
     return null;
   }
 
+  UserModel? _loggedUserDetails;
+  UserModel? get loggedUserDetails => _loggedUserDetails;
+
+  void fetchCurrentUser() async {
+    _loggedUserDetails = await fetchUserDetails();
+    if (_loggedUserDetails != null) {
+      log('User fetched: ${_loggedUserDetails}');
+    } else {
+      log('no user founc');
+    }
+  }
+
   //--------------------------------FetchAllUsers------------------------------------//
   Future<List<UserModel>> fetchAllUsers() async {
     try {
@@ -66,9 +107,23 @@ class UserProvider with ChangeNotifier {
       return [];
     }
   }
+  // Future<void> fetchAllUsers() async {
+  //   try {
+  //     QuerySnapshot snapshot = await _firestore
+  //         .collection('users')
+  //         .orderBy('timestamp', descending: true)
+  //         .get();
 
-  List<UserModel> _filteredUsers = [];
-  List<UserModel> get filteredUsers => _filteredUsers;
+  //         _usersList = snapshot.docs.map((doc){
+  //           try{
+  //             return UserModel.fromDocument(doc);
+
+  //           } catch (e){
+  //             ret
+  //           }
+  //         }).where((users) => users != null).cast()<UserModel>().toList();
+  //   } catch (e) {}
+  // }
 
   List<UserModel> _allUsers = [];
   List<UserModel> get allUsers => _allUsers;
@@ -76,6 +131,9 @@ class UserProvider with ChangeNotifier {
   String _searchQuery = '';
 
   String get searchQuery => _searchQuery;
+
+  List<UserModel> _filteredUsers = [];
+  List<UserModel> get filteredUsers => _filteredUsers;
 
   Future<void> fetchAndSetUsers() async {
     _allUsers = await fetchAllUsers();
@@ -93,6 +151,16 @@ class UserProvider with ChangeNotifier {
           .toList();
     }
     notifyListeners();
+  }
+
+  Future<void> loadUserData() async {
+    try {
+      _user = await fetchUserDetails();
+      _allUsers = await fetchAllUsers();
+      notifyListeners();
+    } catch (e) {
+      log('Failed to load user data');
+    }
   }
 
   //--------------------------------FetchUserById------------------------------------//
@@ -126,19 +194,25 @@ class UserProvider with ChangeNotifier {
       String? downloadImage = await uploadImage(profilPicture);
 
       UserModel newUser = UserModel(
-        id: userCredential.user!.uid,
-        email: email,
-        password: password,
-        username: username,
-        profilPicture: downloadImage.toString(),
-        nickname: 'Add nickname',
-        bio: 'Add Bio',
-        location: 'Add location',
-        date: DateFormat('MMM,d,yyyy').format(DateTime.now()),
-        timestamp: DateTime.now(),
-        followersCount: 0,
-        isFollowed: false,
-      );
+          id: userCredential.user!.uid,
+          email: email,
+          password: password,
+          username: username,
+          profilPicture: downloadImage.toString(),
+          nickname: 'Add nickname',
+          bio: 'Add Bio',
+          location: 'Add location',
+          date: DateFormat('MMM,d,yyyy').format(DateTime.now()),
+          postCount: 0,
+          timestamp: DateTime.now(),
+          followersCount: 0,
+          followingCount: 0,
+          followers: [],
+          followings: [],
+          likedUser: [],
+          likesCount: 0,
+          isDisabled: false,
+          isOnline: false);
 
       await _firestore
           .collection('users')
@@ -285,75 +359,50 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<List<PostModel>> fetchPostsByUserId(String userId) async {
-  try {
-    QuerySnapshot querySnapshot = await _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('posts')
-        .orderBy('date', descending: true)
-        .get();
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('posts')
+          .orderBy('date', descending: true)
+          .get();
 
-    return querySnapshot.docs
-        .map((doc) => PostModel.fromMap(doc.data() as Map<String, dynamic>))
-        .toList();
-  } catch (e) {
-    log('Error fetching posts for user $userId: $e');
-    return [];
+      return querySnapshot.docs
+          .map((doc) => PostModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      log('Error fetching posts for user $userId: $e');
+      return [];
+    }
   }
-}
 
+  Future<void> increamentPostCount(String userId) async {
+    try {
+      if (_user != null) {
+        _user!.postCount++;
+        notifyListeners();
 
-  // Future<void> addPost({
-  //   required String caption,
-  //   required File? image,
-  //   required File? video,
-  // }) async {
-  //   try {
-  //     User? currentUser = _auth.currentUser;
-  //     if (currentUser != null) {
-  //       // String? imageUrl = image != null ? await uploadImage(image) : null;
-  //       // String? videoUrl = video != null ? await uploadVideo(video) : null;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({'postCount': _user!.postCount});
+      }
+    } catch (e) {
+      log('not incresed$e');
+    }
+  }
+  //--------------------------------Media Handling------------------------------------//
 
-  //       String postId = _firestore.collection('posts').doc().id;
-  //       PostModel newPost = PostModel(
-  //         id: postId,
-  //         image: '',
-  //         video: '',
-  //         caption: 'this is nothing',
-  //         date: DateFormat('MMM,d,yyyy').format(DateTime.now()),
-  //       );
-
-  //       await _firestore
-  //           .collection('users')
-  //           .doc(currentUser.uid)
-  //           .collection('posts')
-  //           .doc(postId)
-  //           .set(newPost.toMap());
-
-  //       log('Post added successfully');
-  //       notifyListeners();
-  //     }
-  //   } catch (e) {
-  //     log('Error adding post: $e');
-  //   }
-  // }
-
-  
-
-
-
-
-   //--------------------------------Media Handling------------------------------------//
-
-
-   File? _profileImage;
+  File? _profileImage;
   File? get profileImage => _profileImage;
   final picker = ImagePicker();
   XFile? _selectedMedia;
   CroppedFile? _croppedMedia;
   XFile? _selectedVideo;
-  File? get selectedMedia => _selectedMedia != null ? File(_selectedMedia!.path) : null;
-  File? get croppedMedia => _croppedMedia != null ? File(_croppedMedia!.path) : null;
+  File? get selectedMedia =>
+      _selectedMedia != null ? File(_selectedMedia!.path) : null;
+  File? get croppedMedia =>
+      _croppedMedia != null ? File(_croppedMedia!.path) : null;
   XFile? get selectedVideo => _selectedVideo;
 
   File? _croppedImage;
@@ -382,7 +431,8 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> pickMedia({required bool isGallery, required bool isVideo}) async {
+  Future<void> pickMedia(
+      {required bool isGallery, required bool isVideo}) async {
     if (isVideo) {
       _selectedVideo = await picker.pickVideo(
         source: isGallery ? ImageSource.gallery : ImageSource.camera,
@@ -447,16 +497,18 @@ class UserProvider with ChangeNotifier {
     try {
       User? currentUser = _auth.currentUser;
       if (currentUser != null) {
-        String? imageUrl = image != null ? await uploadMedia(image, 'image') : null;
-        String? videoUrl = video != null ? await uploadMedia(video, 'video') : null;
-
+        String? imageUrl =
+            image != null ? await uploadMedia(image, 'image') : null;
         String postId = _firestore.collection('posts').doc().id;
         PostModel newPost = PostModel(
           id: postId,
+          userId: currentUser.uid,
           image: imageUrl ?? '',
-          video: videoUrl ?? '',
+      
           caption: caption,
           date: DateFormat('MMM,d,yyyy').format(DateTime.now()),
+          likedUsers: [],
+        
         );
 
         await _firestore
@@ -474,6 +526,20 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  //--------------------------------FetchLatestPosts------------------------------------//
+  List<PostModel> _posts = [];
+  List<PostModel> get posts => _posts;
+
+  Future<void> fetchLatestPosts(String userId) async {
+    final userPosts = await fetchPostsByUserId(userId);
+
+    userPosts.sort((a, b) => b.date.compareTo(a.date));
+    if (userPosts.isNotEmpty) {
+      _posts.insert(0, userPosts.first);
+      notifyListeners();
+    }
+  }
+
   //--------------------------------Dispose Media Controllers------------------------------------//
   void disposeMedia() {
     _selectedMedia = null;
@@ -481,35 +547,23 @@ class UserProvider with ChangeNotifier {
     _selectedVideo = null;
     notifyListeners();
   }
+
+  Future<void> refresh() async {
+    await Future.delayed(Duration(seconds: 1));
+    notifyListeners();
+  }
+
+  Future<void> updateComplaint(
+      BuildContext context, String userId, String newComplaint) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .update({'complaint': newComplaint});
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Complaint send successfullyy')));
+    } catch (e) {
+      log('Error sending complaint $e');
+    }
+  }
 }
-
-  //--------------------------------Follow backend------------------------------------//
-
-  // void toggleFollowInBackend(String userId, bool isFollow) async {
-  //   final currentUser = FirebaseAuth.instance.currentUser;
-
-  //   if (isFollow) {
-  //     // Add user to following and increase follower count
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(currentUser!.uid)
-  //         .update({
-  //       'following': FieldValue.arrayUnion([userId]),
-  //     });
-  //     await FirebaseFirestore.instance.collection('users').doc(userId).update({
-  //       'followersCount': FieldValue.increment(1),
-  //     });
-  //   } else {
-  //     // Remove user from following and decrease follower count
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(currentUser!.uid)
-  //         .update({
-  //       'following': FieldValue.arrayRemove([userId]),
-  //     });
-  //     await FirebaseFirestore.instance.collection('users').doc(userId).update({
-  //       'followersCount': FieldValue.increment(-1),
-  //     });
-  //   }
-  // }
-

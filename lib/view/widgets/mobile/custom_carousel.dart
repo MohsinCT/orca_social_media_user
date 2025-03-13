@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 class UpcomeingCourseCarousel extends StatelessWidget {
   const UpcomeingCourseCarousel({super.key});
 
-  @override
+  @override 
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
 
@@ -19,7 +19,7 @@ class UpcomeingCourseCarousel extends StatelessWidget {
 
     if (courses.isEmpty) {
       Future.microtask(() => fetchUpcomingCourses.fetchUpcomingCourses());
-    }
+    } 
 
     return courses.isNotEmpty
         ? CarouselSlider(

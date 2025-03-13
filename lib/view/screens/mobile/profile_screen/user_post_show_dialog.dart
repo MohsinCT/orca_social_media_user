@@ -27,8 +27,8 @@ class PostDialog extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         listTile(Icons.photo, sharePost, sharePosts),
-        Divider(),
-        listTile(Icons.message, shareMessage, shareMessages) ,
+        // Divider(),
+        // listTile(Icons.message, shareMessage, shareMessages) ,
         Divider(),
         listTile(Icons.timer, shareStory, (shareStories)),
       

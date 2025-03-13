@@ -28,13 +28,17 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.example.orca_social_media"
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+    jvmTarget = '1.8'
+}
+
 
     defaultConfig {
         applicationId = "com.example.orca_social_media"

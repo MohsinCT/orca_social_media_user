@@ -1,141 +1,187 @@
 import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
+import 'package:orca_social_media/controllers/auth/register.dart';
+import 'package:orca_social_media/models/register_model.dart';
+import 'package:orca_social_media/view/screens/mobile/profile_screen/edit_profile.dart';
+import 'package:orca_social_media/view/screens/mobile/profile_screen/followers.dart';
+import 'package:orca_social_media/view/screens/mobile/profile_screen/followings.dart';
+import 'package:orca_social_media/view/widgets/mobile/custom_follow_button.dart';
+import 'package:orca_social_media/view/widgets/mobile/custom_message_button.dart';
+import 'package:orca_social_media/view/widgets/mobile/custom_text.dart';
+import 'package:provider/provider.dart';
+
 import 'package:shimmer/shimmer.dart';
 
 class UsersDetails extends StatelessWidget {
+  final UserModel user;
+  final String userId;
   final String userImage;
+  final String username;
   final String nickname;
   final String bio;
   final String location;
   final String date;
-  const UsersDetails({super.key, required this.userImage, required this.nickname, required this.bio, required this.location, required this.date,});
+  final int followersCount;
+  final int followingCount;
+  final int postCount;
+  const UsersDetails({
+    super.key,
+    required this.user,
+    required this.userImage,
+    required this.username,
+    required this.nickname,
+    required this.bio,
+    required this.location,
+    required this.date,
+    required this.followersCount,
+    required this.followingCount,
+    required this.userId,
+    required this.postCount,
+  });
 
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
-    
-    
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    String? currentUser = userProvider.getLoggedUserId();
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: mediaQuery.screenHeight * 0.04,
-          ),
-          child: ListTile(
-            leading: // Ensures the image fits inside the circle
-                GestureDetector(
-              onLongPress: () {
-                _showAvatarDetail(context, '');
-              },
-              child: Container(
-                width: mediaQuery.screenWidth *
-                    0.15, // Set the desired size (diameter)
-                height: mediaQuery.screenHeight *
-                    9, // Ensure width and height are equal for a circle
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle, // Makes the container circular
-                  border: Border.all(
-                      color: Colors.grey, width: 2), // Optional border
-                ),
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: userImage,
-                    width: 150, // Match the size of the container
-                    height: 150,
-                    fit: BoxFit
-                        .cover, // Ensures the image fits properly inside the circle
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(), // Optional placeholder
-                    errorWidget: (context, url, error) => const Icon(
-                        Icons.error,
-                        size: 60), // Optional error widget
-                  ),
-                ),
-              ),
-            ),
-            trailing: Padding(
-              padding: EdgeInsets.only(right: mediaQuery.screenWidth * 0.07),
-              child: InkWell(
-                onTap: () {
-                  // Add your edit profile functionality here
-                },
-                child: InkWell(
-                  onTap: () {},
-                  child: Container(
-                    width: 70,
-                    height: 30,
-                    decoration: const BoxDecoration(
-                      color: AppColors.oRLightGrey,
-                    ),
-                    child: const Center(
-                      child: Text('Message'),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Text(
-          nickname,
-          style: const TextStyle(fontSize: 20),
-        ),
         SizedBox(height: mediaQuery.screenHeight * 0.02),
-        Text(bio),
-        SizedBox(height: mediaQuery.screenHeight * 0.02),
-        Row(
+
+        /// **Profile Picture & Stats**
+        Column(
           children: [
-            InkWell(
-              onTap: () {},
-              child: const Text(
-                '0 Followers',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
+            GestureDetector(
+              onLongPress: () {
+                _showAvatarDetail(context, userImage);
+              },
+              child: CircleAvatar(
+                radius: mediaQuery.screenWidth * 0.15,
+                backgroundColor: Colors.grey.shade200,
+                backgroundImage: CachedNetworkImageProvider(userImage),
+                child: userImage.isEmpty
+                    ? const Icon(Icons.person, size: 40, color: Colors.grey)
+                    : null,
               ),
             ),
-            SizedBox(width: mediaQuery.screenWidth * 0.1),
-            InkWell(
-              onTap: () {},
-              child: const Text(
-                '0 Following',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+            SizedBox(height: mediaQuery.screenHeight * 0.015),
+            Column(
+              children: [
+                Text(
+                  '@${username}',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-              ),
+                SizedBox(height: mediaQuery.screenHeight * 0.01),
+                Text(
+                  nickname == 'Add nickname' ? username : nickname,
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey.shade700),
+                ),
+                SizedBox(height: mediaQuery.screenHeight * 0.02),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: mediaQuery.screenWidth * 0.08),
+                  child: bio == 'Add Bio'
+                      ? SizedBox.shrink()
+                      : Text(
+                          bio,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 14, color: Colors.grey.shade800),
+                        ),
+                ),
+              ],
             ),
-            SizedBox(width: mediaQuery.screenWidth * 0.1),
-            InkWell(
-              onTap: () {},
-              child: const Text(
-                '0 Posts',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+            SizedBox(
+              height: mediaQuery.screenHeight * 0.01,
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: mediaQuery.screenWidth * 0.2),
+              child: Container(
+                child: Row(
+                  children: [
+                    CustomText(count: postCount, text: 'Posts'),
+                    SizedBox(width: mediaQuery.screenWidth * 0.08),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => Followers(userId: userId)));
+                      },
+                      child:
+                          CustomText(count: followersCount, text: 'Followers'),
+                    ),
+                    SizedBox(width: mediaQuery.screenWidth * 0.08),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => Followings(userId: userId)));
+                      },
+                      child:
+                          CustomText(count: followingCount, text: 'Followings'),
+                    ),
+                  ],
                 ),
               ),
             ),
           ],
         ),
+
+        SizedBox(height: mediaQuery.screenHeight * 0.025),
+
+        userId != currentUser
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FollowButton(userId: userId, username: username,),
+                  SizedBox(
+                    width: mediaQuery.screenWidth * 0.04,
+                  ),
+                  CustomMessageButton(
+                    userID: userId,
+                    username: username,
+                  )
+                ],
+              )
+            : GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => EditProfile(user: user)));
+                },
+                child: Container(
+                    width: mediaQuery.screenWidth * 0.54,
+                    height: mediaQuery.screenHeight * 0.03,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.oRGrey300f),
+                    child: Center(
+                        child: Text(
+                      'Edit Profile',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ))),
+              ),
+
+        SizedBox(height: mediaQuery.screenHeight * 0.025),
+
+        /// **Location & Membership**
         ListTile(
-          leading: Icon(Icons.location_on),
+          leading: Icon(Icons.location_on, color: Colors.redAccent),
           title: Text(
-            location,
-            style: TextStyle(fontSize: 12),
+            location == 'Add location' ? 'Not added' : user.location,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ),
         ListTile(
-          leading: Icon(Icons.card_membership),
+          leading: Icon(Icons.card_membership, color: Colors.blueAccent),
           title: Text(
-            'Member since ${date}',
-            style: TextStyle(fontSize: 12),
+            'Member since ${user.date}',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ),
       ],

@@ -9,4 +9,5 @@ class AppColors {
   static Color oRGrey300f = Colors.grey[300]!;
   static Color oRGrey100 = Colors.grey[100]!;
   static Color orRed = Colors.red;
+  static const Color orGrey = Colors.grey;
 }

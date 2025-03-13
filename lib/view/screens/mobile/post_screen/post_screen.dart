@@ -2,10 +2,12 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/media_query.dart';
+import 'package:orca_social_media/controllers/counter.dart';
+import 'package:orca_social_media/controllers/dummy_post_controller.dart';
 import 'package:orca_social_media/controllers/media_provider.dart';
 
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
+// import 'package:video_player/video_player.dart';
 
 class PostScreen extends StatefulWidget {
   final String? userId;
@@ -22,8 +24,7 @@ class _PostScreenState extends State<PostScreen> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
     final postProvider = Provider.of<MediaProvider>(context, listen: false);
-
-  
+    final dummyPost = Provider.of<DummyPostController>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,17 +45,8 @@ class _PostScreenState extends State<PostScreen> {
             children: [
               // Media Preview
               Consumer<MediaProvider>(
-                builder: (context, provider, child) {
-                  if (provider.selectedVideo != null &&
-                      provider.videoPlayerController != null) {
-                    // Video Preview
-                    return AspectRatio(
-                      aspectRatio:
-                          provider.videoPlayerController?.value.aspectRatio ??
-                              16 / 9,
-                      child: VideoPlayer(provider.videoPlayerController!),
-                    );
-                  } else if (provider.croppedImage != null) {
+                builder: (context, postProvider, child) {
+                  if (postProvider.croppedImage != null) {
                     // Image Preview
                     return Container(
                       width: mediaQuery.screenWidth,
@@ -65,7 +57,7 @@ class _PostScreenState extends State<PostScreen> {
                         color: Colors.grey[200],
                       ),
                       child: Image.file(
-                        File(provider.croppedImage!.path),
+                        File(postProvider.croppedImage!.path),
                         fit: BoxFit.cover,
                       ),
                     );
@@ -131,41 +123,41 @@ class _PostScreenState extends State<PostScreen> {
                     icon: const Icon(Icons.photo),
                     label: const Text('Pick Image'),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Choose an option'),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                ListTile(
-                                  leading: const Icon(Icons.video_library),
-                                  title: const Text('Pick Video from Gallery'),
-                                  onTap: () {
-                                    postProvider.pickVideo(true);
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.videocam),
-                                  title: const Text('Record Video'),
-                                  onTap: () {
-                                    postProvider.pickVideo(false);
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    icon: const Icon(Icons.video_library),
-                    label: const Text('Pick Video'),
-                  ),
+                  // ElevatedButton.icon(
+                  //   onPressed: () {
+                  //     showDialog(
+                  //       context: context,
+                  //       builder: (context) {
+                  //         return AlertDialog(
+                  //           title: const Text('Choose an option'),
+                  //           content: Column(
+                  //             mainAxisSize: MainAxisSize.min,
+                  //             children: [
+                  //               ListTile(
+                  //                 leading: const Icon(Icons.video_library),
+                  //                 title: const Text('Pick Video from Gallery'),
+                  //                 onTap: () {
+                  //                   postProvider.pickVideo(true);
+                  //                   Navigator.pop(context);
+                  //                 },
+                  //               ),
+                  //               ListTile(
+                  //                 leading: const Icon(Icons.videocam),
+                  //                 title: const Text('Record Video'),
+                  //                 onTap: () {
+                  //                   postProvider.pickVideo(false);
+                  //                   Navigator.pop(context);
+                  //                 },
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         );
+                  //       },
+                  //     );
+                  //   },
+                  //   icon: const Icon(Icons.video_library),
+                  //   label: const Text('Pick Video'),
+                  // ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -200,31 +192,46 @@ class _PostScreenState extends State<PostScreen> {
               Center(
                 child: ElevatedButton(
                   onPressed: () async {
-                    try{
+                    try {
+                      String userId = widget.userId ?? '';
+                      if (postProvider.selectedImage == null &&
+                          _captionController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please fill missing fields'),
+                          ),
+                        );
+                        return;
+                      }
+                      showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              content: Row(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(
+                                    width: mediaQuery.screenWidth * 0.07,
+                                  ),
+                                  Text('Adding new post'),
+                                ],
+                              ),
+                            );
+                          });
 
-                      String  userId = widget.userId ?? '';
-                    if (postProvider.selectedImage == null &&
-                        postProvider.selectedVideo == null &&
-                        _captionController.text.trim().isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please fill missing fields'),
-                        ),
-                      );
-                      return;
-                    }
-                    await postProvider.uploadMediaAndCreatePost(
-                      context: context, 
-                      userId: userId, 
-                      captionController: _captionController);
+                      await postProvider.uploadMediaAndCreatePost(
+                          context: context,
+                          userId: userId,
+                          captionController: _captionController);
 
-                    }catch (e){
+                      Provider.of<CounterProvider>(context, listen: false)
+                          .increamentPostCount(userId);
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    } catch (e) {
                       log('failed to add a new post $e');
-
                     }
-                    
-
-                  
                   },
                   child: const Text('Share'),
                 ),
@@ -236,4 +243,3 @@ class _PostScreenState extends State<PostScreen> {
     );
   }
 }
-

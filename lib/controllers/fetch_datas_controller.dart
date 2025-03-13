@@ -14,7 +14,7 @@ class FetchUpcomingCourses extends ChangeNotifier {
 
   FetchUpcomingCourses() {
     fetchUpcomingCourses();
-  }
+  } 
 
   /// Fetch upcoming courses with proper error handling and null checks
   Future<void> fetchUpcomingCourses() async {

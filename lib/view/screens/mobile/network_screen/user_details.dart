@@ -4,9 +4,9 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
-import 'package:orca_social_media/models/post_model.dart';
 import 'package:orca_social_media/models/register_model.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_appbar.dart';
+import 'package:orca_social_media/view/widgets/mobile/custom_post_screen.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_user_shimmer.dart';
 import 'package:orca_social_media/view/widgets/mobile/users_details.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +22,6 @@ class UserProfile extends StatelessWidget {
 
   final List<String> tabNames = [
     'Posts',
-    'Liked',
   ];
 
   Future<void> _handleRefresh(BuildContext context) async {
@@ -33,6 +32,8 @@ class UserProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+     
+    final currentUser =  userProvider.getLoggedUserId();
 
     return DefaultTabController(
       length: tabNames.length,
@@ -83,15 +84,17 @@ class UserProfile extends StatelessWidget {
                                 }
                                 final user = snapshot.data!;
                                 return UsersDetails(
+                                  username: user.username,
+                                  user: user,
+                                  userId: user.id,
+                                  followingCount: user.followingCount,
+                                  followersCount: user.followersCount,
                                   userImage: user.profilPicture,
-                                  nickname: user.nickname == 'Add nickname'
-                                      ? '--'
-                                      : user.nickname,
-                                  bio: user.bio == 'Add Bio' ? '--' : user.bio,
-                                  location: user.location == 'Add location'
-                                      ? 'Not added'
-                                      : user.location,
+                                  nickname: user.nickname,
+                                  bio: user.bio,
+                                  location: user.location,
                                   date: user.date,
+                                  postCount: user.postCount,
                                 );
                               },
                             ),
@@ -104,14 +107,20 @@ class UserProfile extends StatelessWidget {
                             SizedBox(
                               height: mediaQuery.screenHeight * 0.74,
                               child: TabBarView(children: [
-                                FutureBuilder<List<PostModel>>(
-                                  future: Provider.of<UserProvider>(context,
-                                          listen: false)
-                                      .fetchPostsByUserId(userId),
+                                FutureBuilder<List<dynamic>>(
+                                  future: Future.wait({
+                                    Provider.of<UserProvider>(context,
+                                            listen: false)
+                                        .fetchPostsByUserId(userId),
+                                    Provider.of<UserProvider>(context,
+                                            listen: false)
+                                        .fetchUserById(userId),
+                                  }),
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
-                                      return Center(child: CircularProgressIndicator());
+                                      return Center(
+                                          child: CircularProgressIndicator());
                                     } else if (snapshot.hasError) {
                                       return Center(
                                         child: Text('Error: ${snapshot.error}'),
@@ -123,7 +132,8 @@ class UserProfile extends StatelessWidget {
                                       );
                                     }
 
-                                    final posts = snapshot.data!;
+                                    final posts = snapshot.data![0];
+                                    final user = snapshot.data![1] as UserModel;
                                     return GridView.builder(
                                       padding: const EdgeInsets.all(10),
                                       gridDelegate:
@@ -136,51 +146,101 @@ class UserProfile extends StatelessWidget {
                                       shrinkWrap: true,
                                       itemBuilder: (context, index) {
                                         final post = posts[index];
-                                        return Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            border:
-                                                Border.all(color: Colors.grey),
-                                          ),
-                                          child: post.image.isNotEmpty
-                                              ? ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                  child: CachedNetworkImage(
-                                                    imageUrl: post.image,
-                                                    fit: BoxFit.cover,
-                                                    width: double.infinity,
-                                                    height: double.infinity,
-                                                    placeholder:
-                                                        (context, url) =>
-                                                            Shimmer.fromColors(
-                                                      baseColor:
-                                                          Colors.grey[300]!,
-                                                      highlightColor:
-                                                          Colors.grey[100]!,
-                                                      child: Container(
-                                                        color: Colors.grey,
-                                                        width: double.infinity,
-                                                        height: double.infinity,
+                                        return GestureDetector(
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PostPage(
+                                                          userProfile: user
+                                                              .profilPicture,
+                                                          username:
+                                                              user.username,
+                                                          postedImage:
+                                                              post.image,
+                                                          usernameForcaption:
+                                                              user.username,
+                                                          caption: post.caption,
+                                                          date: post.date,
+                                                          postId: post.id,
+                                                          userId: user.id,
+                                                          likes: List<
+                                                                  String>.from(
+                                                              post.likedUsers),
+                                                          onPressed: () {},
+                                                          delete: () {}, 
+                                                        
+                                                          edit: () { },
+                                                        )));
+
+                                            // showDialog(
+                                            //     context: context,
+                                            //     builder: (_) =>
+                                            //         PostDetailDialog(
+                                            //             userProfile:
+                                            //                 user.profilPicture,
+                                            //             username: user.username,
+                                            //             postedImage: post.image,
+                                            //             usernameForcaption:
+                                            //                 user.username,
+                                            //             caption: post.caption,
+                                            //             date: post.date,
+                                            //             postId: post.id,
+                                            //             userId: userId,
+                                            //             likes: List<String>.from(user.likedUser),
+                                            //             onPressed: (){},
+                                            //             ));
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              border: Border.all(
+                                                  color: Colors.grey),
+                                            ),
+                                            child:
+                                             post.image.isNotEmpty
+                                                ? ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    child: CachedNetworkImage(
+                                                      imageUrl: post.image,
+                                                      fit: BoxFit.cover,
+                                                      width: double.infinity,
+                                                      height: double.infinity,
+                                                      placeholder: (context,
+                                                              url) =>
+                                                          Shimmer.fromColors(
+                                                        baseColor:
+                                                            Colors.grey[300]!,
+                                                        highlightColor:
+                                                            Colors.grey[100]!,
+                                                        child: Container(
+                                                          color: Colors.grey,
+                                                          width:
+                                                              double.infinity,
+                                                          height:
+                                                              double.infinity,
+                                                        ),
+                                                      ),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          const Center(
+                                                        child: Icon(Icons.error,
+                                                            color: Colors.red),
                                                       ),
                                                     ),
-                                                    errorWidget:
-                                                        (context, url, error) =>
-                                                            const Center(
-                                                      child: Icon(Icons.error,
-                                                          color: Colors.red),
-                                                    ),
-                                                  ),
-                                                )
-                                              : post.video.isNotEmpty
-                                                  ? const Icon(
-                                                      Icons.video_library,
-                                                      color: Colors.grey,
-                                                    )
-                                                  : const Center(
-                                                      child: Text('No Media'),
-                                                    ),
+                                                  )
+                                                : post.video.isNotEmpty
+                                                    ? const Icon(
+                                                        Icons.video_library,
+                                                        color: Colors.grey,
+                                                      )
+                                                    : const Center(
+                                                        child: Text('No Media'),
+                                                      ),
+                                          ),
                                         );
                                       },
                                       itemCount: posts.length,

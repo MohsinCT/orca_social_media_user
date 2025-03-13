@@ -12,7 +12,7 @@ class UpcomingCourseModel {
     required this.upcomingCourseName,
     required this.upComingCourseDetails,
   });
-
+ 
   // Factory constructor to create an instance from Firestore document
   factory UpcomingCourseModel.fromDocument(DocumentSnapshot doc) {
     return UpcomingCourseModel(

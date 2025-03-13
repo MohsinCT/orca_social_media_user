@@ -1,9 +1,13 @@
+import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/images.dart';
 import 'package:orca_social_media/constants/media_query.dart';
+import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/fetch_datas_controller.dart';
+
+import 'package:orca_social_media/view/screens/mobile/home_screen/messages.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/user_postview.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_appbar.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_carousel.dart';
@@ -12,14 +16,18 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
+  const HomeScreen({
+    super.key,
+  });
+ 
   Future<void> _handleRefresh(BuildContext context) async {
     Provider.of<FetchUpcomingCourses>(context, listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    String? currentUser = userProvider.getLoggedUserId();
     final mediaQuery = MediaQueryHelper(context);
 
     return Scaffold(
@@ -29,10 +37,18 @@ class HomeScreen extends StatelessWidget {
           AppImages.orcaLogoTrans,
           height: 60,
         ),
-      
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.notifications)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.message))
+          IconButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => MessagesScreen(
+                          user: ChatUser(id: currentUser!),
+                          userId: currentUser,
+                        )));
+              },
+              icon: Icon(
+                Icons.message,
+              ))
         ],
       ),
       body: LiquidPullToRefresh(
@@ -66,15 +82,17 @@ class HomeScreen extends StatelessWidget {
                       ));
                 } else {
                   return const UpcomeingCourseCarousel();
-                }
+                } 
               }),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: mediaQuery.screenHeight * 0.02,
-                ),
-                child: StoryCircle(),
+              SizedBox(
+                height: mediaQuery.screenHeight * 0.02,
               ),
-              PostView(),
+              StoryCircle(
+                userId: currentUser!,
+              ),
+              PostView(
+                userId: currentUser,
+              ),
             ],
           ),
         ),

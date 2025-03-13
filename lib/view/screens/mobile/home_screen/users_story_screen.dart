@@ -20,14 +20,14 @@ class UsersStories extends StatelessWidget {
       body: SafeArea(
         child: ChangeNotifierProvider(
           create: (context) =>
-              StoryStateController(TickerProviderStateMixinImplementation()),
+              StoryStateController(TickerProviderStateMixinImplementation(),context ),
           child: Consumer2<StoryStateController, StoryProvider>(
             builder: (context, storyStsProvider, storyProvider, child) {
               final stories = storyProvider.stories;
 
               if (stories.isEmpty) {
                 return const Center(
-                  child: Text('No stories available',style: TextStyle(
+                  child: Text('No stories on this user',style: TextStyle(
                     color: Colors.white
                   ),),
                 );

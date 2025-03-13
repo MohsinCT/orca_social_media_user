@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/colors.dart';
-import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/navigation_provider.dart';
 import 'package:orca_social_media/view/screens/mobile/academy_screen/academy.dart';
-import 'package:orca_social_media/view/screens/mobile/chat_bot_screen/chat_bot.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/home_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/network_screen/network.dart';
-import 'package:orca_social_media/view/screens/mobile/post_screen/post_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/profile_screen/user_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -15,7 +12,7 @@ class BottomNavScreen extends StatelessWidget {
   final List<Widget> _screens = [
     HomeScreen(),
     NetworkScreen(),
-    ChatBotScreen(),
+    // ChatBotScreen(),
     AcademyScreen(),
     ProfileScreen()
   ];
@@ -24,8 +21,8 @@ class BottomNavScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context , listen: false);
-    final userId = userProvider.userId;
+    // final userProvider = Provider.of<UserProvider>(context , listen: false);
+    
     return Scaffold(
       extendBody:
           true, // Enables the body to extend behind the bottom navigation bar
@@ -41,17 +38,17 @@ class BottomNavScreen extends StatelessWidget {
             index: provider.currentIndex,
             height: 75, // Increased height for text space
             items: <Widget>[
-              _buildNavItem(Icons.feed, "Home", provider.currentIndex == 0),
+              _buildNavItem(Icons.home, "Home", provider.currentIndex == 0),
               _buildNavItem(
                   Icons.people, "Network", provider.currentIndex == 1),
-              _buildNavItem(Icons.chat_bubble_rounded, "Chat bot",
-                  provider.currentIndex == 2),
+              // _buildNavItem(Icons.chat_bubble_rounded, "Chat bot",
+              //     provider.currentIndex == 2),
               _buildNavItem(
-                  Icons.class_, "Academy", provider.currentIndex == 3),
+                  Icons.class_, "Academy", provider.currentIndex == 2),
               _buildNavItem(
-                  Icons.person, "Profile", provider.currentIndex == 4),
+                  Icons.person, "Profile", provider.currentIndex == 3),
             ],
-            color: Colors.black, // Make the curved portion fully transparent
+            color: Colors.black.withOpacity(0.9), // Make the curved portion fully transparent
             buttonBackgroundColor:
                 Colors.transparent, // Transparent button background
             backgroundColor: Colors
@@ -74,12 +71,12 @@ class BottomNavScreen extends StatelessWidget {
         Icon(
           icon,
           size: 25,
-          color: isSelected ? Colors.orange : AppColors.oRwhite,
+          color: isSelected ? Colors.black : AppColors.oRwhite,
         ),
         Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.orange : AppColors.oRwhite,
+            color: isSelected ? Colors.black : AppColors.oRwhite,
             fontSize: 11, // Adjust the font size as needed
           ),
         ),

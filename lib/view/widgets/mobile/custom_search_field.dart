@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
-class SearchField extends StatelessWidget {
-  TextEditingController controller;
-  ValueChanged<String> onChanged;
-  SearchField({super.key, required this.controller, required this.onChanged});
+class CustomSearchField extends StatelessWidget {
+  final String hintText;
+  final Icon prefixIcon;
+  final ValueChanged<String> onChanged;
+
+  const CustomSearchField(
+      {super.key,
+      required this.hintText,
+      required this.prefixIcon,
+      required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
+    return TextField(
       decoration: InputDecoration(
-        hintText: 'Search...',
-        prefixIcon: Icon(Icons.search),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
+          hintText: hintText,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
       onChanged: onChanged,
     );
   }
