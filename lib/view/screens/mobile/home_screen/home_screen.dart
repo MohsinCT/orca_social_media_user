@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
         centerTitle: true,
         title: Image.asset(
           AppImages.orcaLogoTrans,
-          height: 60,
+          height: mediaQuery.screenHeight * 0.02,  // 60
         ),
         actions: [
           IconButton(
