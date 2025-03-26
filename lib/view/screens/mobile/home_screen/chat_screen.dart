@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/chat_controller.dart';
@@ -114,6 +116,7 @@ class _ChatScreenState extends State<ChatScreen> {
       
                   if (list.isNotEmpty) {
                     return ListView.builder(
+                      reverse: true,
                       itemCount: list.length,
                       padding:
                           EdgeInsets.only(top: mediaQuery.screenHeight * 0.01),
@@ -213,7 +216,15 @@ class _ChatScreenState extends State<ChatScreen> {
               IconButton(onPressed: () {
 
               }, icon: Icon(Icons.image)),
-              IconButton(onPressed: () {
+              IconButton(onPressed: () async{
+    final ImagePicker picker = ImagePicker();
+
+
+                final XFile? image = await picker.pickImage(source: ImageSource.camera , imageQuality: 70);
+                if(image != null){
+                  log('Image path : ${image.path}');
+                 await APIs.sendChatImage(widget.user, File(image.path));
+                }
                 
               }, icon: Icon(Icons.camera)),
             ],
@@ -224,7 +235,7 @@ class _ChatScreenState extends State<ChatScreen> {
         minWidth: 0,
         onPressed: () {
           if (controller.text.isNotEmpty) {
-            APIs.sendMessage(user, controller.text);
+            APIs.sendMessage(user, controller.text ,Type.text);
             controller.text = '';
           }
         },

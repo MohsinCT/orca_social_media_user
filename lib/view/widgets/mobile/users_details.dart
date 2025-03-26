@@ -139,7 +139,7 @@ class UsersDetails extends StatelessWidget {
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  FollowButton(userId: userId, username: username,),
+                  FollowButton(userId: userId,),
                   SizedBox(
                     width: mediaQuery.screenWidth * 0.04,
                   ),

@@ -6,7 +6,7 @@ class PostModel {
   final String date;
   final List<String> likedUsers; // Changed to a list of liked users
 
-  
+   
   PostModel({
     required this.id,
     required this.userId,

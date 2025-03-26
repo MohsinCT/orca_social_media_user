@@ -71,6 +71,62 @@ import 'package:provider/provider.dart';
 //   }
 // }
 
+class CustomTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelText;
+  final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
+  final bool isPassword;
+  final String? prefixText;
+  const CustomTextField(
+      {super.key,
+      required this.controller,
+      this.isPassword = false,
+      required this.labelText,
+      this.keyboardType,
+      this.validator,
+      this.prefixText});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<TextfieldProvider>(
+      builder: (context, textProvider, child) {
+        return TextFormField(
+          keyboardType: keyboardType,
+          controller: controller,
+          obscureText: isPassword && textProvider.obscureText,
+          decoration: InputDecoration(
+            enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white)),
+            focusedBorder:
+                OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+            fillColor: Colors.grey.shade200,
+            filled: true,
+            prefixText: prefixText,
+            labelText: labelText,
+            labelStyle: const TextStyle(color: Colors.black),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(textProvider.obscureText
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: textProvider.toggleObscureText,
+                  )
+                : null,
+            // enabledBorder: OutlineInputBorder(
+            //   borderRadius: BorderRadius.circular(10),
+            //   borderSide: const BorderSide(
+            //     color: Colors.black,
+            //     width: 2.0,
+            //   ),
+            // ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class NewCustomTextFormField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
@@ -99,7 +155,7 @@ class NewCustomTextFormField extends StatelessWidget {
           keyboardType: keyboardType,
           obscureText: isPassword && provider.obscureText,
           decoration: InputDecoration(
-            contentPadding:const EdgeInsets.symmetric(
+            contentPadding: const EdgeInsets.symmetric(
               vertical: 16.0,
               horizontal: 10.0,
             ),

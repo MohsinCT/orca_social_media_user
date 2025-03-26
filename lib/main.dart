@@ -19,6 +19,7 @@ import 'package:orca_social_media/controllers/login_provider.dart';
 import 'package:orca_social_media/controllers/login_shared_prefs.dart';
 import 'package:orca_social_media/controllers/media_provider.dart';
 import 'package:orca_social_media/controllers/navigation_provider.dart';
+import 'package:orca_social_media/controllers/notification_controller.dart';
 import 'package:orca_social_media/controllers/save_post_controller.dart';
 import 'package:orca_social_media/controllers/search_controller.dart';
 import 'package:orca_social_media/controllers/story_controller.dart';
@@ -78,6 +79,7 @@ class MyApplication extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ComplaintController()),
         ChangeNotifierProvider(create: (_) => SavePostProvider()),
         ChangeNotifierProvider(create: (_) => DummyPostController()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ProxyProvider<TickerProvider, StoryStateController>(
             update: (_, vsync, __) => StoryStateController(vsync, context))
       ],

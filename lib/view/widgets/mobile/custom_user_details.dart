@@ -19,7 +19,7 @@ class UserDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     // final mediaQuery = MediaQueryHelper(context);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-
+      
     return FutureBuilder<UserModel?>(
       future: userProvider.fetchUserDetails(),
       builder: (context, snapshot) {

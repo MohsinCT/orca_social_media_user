@@ -7,7 +7,7 @@ class UserFormPage extends StatelessWidget {
   final TextEditingController usernameController;
   final TextEditingController emailController;
   final TextEditingController passwordController;
-  final TextEditingController conformController;
+  final TextEditingController confirmController;
   final GlobalKey<FormState> formkey;
 
   const UserFormPage(
@@ -16,7 +16,7 @@ class UserFormPage extends StatelessWidget {
       required this.emailController,
       required this.passwordController,
       required this.formkey,
-      required this.conformController
+      required this.confirmController
       });
 
   @override
@@ -26,42 +26,71 @@ class UserFormPage extends StatelessWidget {
       key : formkey,
       child: Column(
         children: [
-          NewCustomTextFormField(
-            controller: usernameController, 
-            labelText: 'Username',
-            keyboardType: TextInputType.text,
-            validator: (value) => ValidationUtils.validate(value , 'Username'),
-            ),
+          CustomTextField(
+            controller: usernameController,
+             labelText: 'Username',
+             keyboardType: TextInputType.text,
+             validator: (value) => ValidationUtils.validate(value, 'Username') ,
+             ),
+          // NewCustomTextFormField(
+          //   controller: usernameController, 
+          //   labelText: 'Username',
+          //   keyboardType: TextInputType.text,
+          //   validator: (value) => ValidationUtils.validate(value , 'Username'),
+          //   ),
             SizedBox(
               height: mediaQuery.screenHeight * 0.02,
             ),
-            NewCustomTextFormField(
-              controller: emailController,
-               labelText: 'Email',
-               validator: (value) => ValidationUtils.validateemail(value),
-               ),
+            CustomTextField(
+              controller: emailController, 
+              labelText: 'Email',
+              validator: (value) => ValidationUtils.validateemail(value),
+              ),
+            // NewCustomTextFormField(
+            //   controller: emailController,
+            //    labelText: 'Email',
+            //    validator: (value) => ValidationUtils.validateemail(value),
+            //    ),
                SizedBox(
               height: mediaQuery.screenHeight * 0.02,
             ),
-            NewCustomTextFormField(
-            controller: passwordController, 
-            labelText: 'Password',
-            validator: (value) => ValidationUtils.validate(value, 'Password'),
-            isPassword: true,
-            ),
+            CustomTextField(
+              controller: passwordController, 
+              labelText: 'Password',
+              validator: (value) => ValidationUtils.validate(value, 'Password'),
+               isPassword: true,
+              ),
+            // NewCustomTextFormField(
+            // controller: passwordController, 
+            // labelText: 'Password',
+            // validator: (value) => ValidationUtils.validate(value, 'Password'),
+            // isPassword: true,
+            // ),
             SizedBox(
               height: mediaQuery.screenHeight * 0.02,
             ),
-            NewCustomTextFormField(
-              controller:conformController ,
-             labelText: 'Conform password',
-             validator: (value) {
-              if(value != passwordController.text){
-                return 'password does not match';
-              } 
-              return null;
-             },
-            )
+            CustomTextField(
+              controller: confirmController, 
+              labelText: 'Confirm password',
+              validator: (value){
+                if(value != passwordController.text){
+                  return 'password does not match';
+                }
+                return null;
+
+              },
+              isPassword: true,
+              )
+            // NewCustomTextFormField(
+            //   controller:conformController ,
+            //  labelText: 'Conform password',
+            //  validator: (value) {
+            //   if(value != passwordController.text){
+            //     return 'password does not match';
+            //   } 
+            //   return null;
+            //  },
+            // )
         ],
       ));
   }

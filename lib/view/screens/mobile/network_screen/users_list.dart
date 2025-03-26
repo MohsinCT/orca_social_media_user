@@ -115,7 +115,7 @@ class UsersSearchList extends StatelessWidget {
                           ),
                           trailing: FollowButton(
                             userId: user.id,
-                            username: user.username,
+                           
                           ),
                         ),
                       );

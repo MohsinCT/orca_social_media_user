@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/splash_provider.dart';
@@ -33,7 +34,10 @@ class SplashScreen extends StatelessWidget {
               );
             } else {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CupertinoActivityIndicator(
+                  radius: 30,
+                  color: Colors.black,
+                ),
               );
             }
           },

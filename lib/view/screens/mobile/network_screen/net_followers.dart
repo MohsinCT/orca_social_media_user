@@ -142,7 +142,7 @@ class NetFollowers extends StatelessWidget {
                                   follower['nickname'] == 'Add nickname'
                                       ? ''
                                       : follower['nickname']),
-                                      trailing: FollowButton(userId: follower['id'] , username: follower['username'],),
+                                      trailing: FollowButton(userId: follower['id'] ,),
                             ),
                           );
                   },

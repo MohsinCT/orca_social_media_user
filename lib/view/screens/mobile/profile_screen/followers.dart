@@ -103,7 +103,7 @@ class Followers extends StatelessWidget {
                         subtitle: Text(follower['nickname'] == 'Add nickname'
                             ? ''
                             : follower['nickname']),
-                            trailing: FollowButton(userId: follower['id'] , username: follower['username'],),
+                            trailing: FollowButton(userId: follower['id'] ,),
                       ),
                     );
                   },

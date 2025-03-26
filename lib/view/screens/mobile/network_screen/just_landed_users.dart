@@ -204,7 +204,7 @@ class JustLandedUsers extends StatelessWidget {
                                 ),
                                 FollowButton(
                                   userId: user.id,
-                                  username: user.username,
+                                  
                                 )
                               ]),
                             )

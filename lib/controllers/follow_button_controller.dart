@@ -20,7 +20,7 @@ class FollowProvider with ChangeNotifier {
   // Follow a user
   Future<void> followUser(String targetUserId) async {
     final currentUser = _auth.currentUser;
-    if (currentUser == null) {
+    if (currentUser == null) {          
       throw Exception('User not authenticated');
     }
     final currentUserId = currentUser.uid;
@@ -112,7 +112,7 @@ class FollowProvider with ChangeNotifier {
 Future<void> initFollowState(String userId) async {
     await fetchFollowState(userId);
   }
- 
+  
 
   // Toggle follow/unfollow state
   Future<void> toggleFollow(String targetUserId) async {

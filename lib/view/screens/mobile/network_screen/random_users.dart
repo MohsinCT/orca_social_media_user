@@ -121,7 +121,7 @@ class RandomUsers extends StatelessWidget {
                           ),
                           FollowButton(
                             userId: userR.id,
-                            username: userR.username,
+                            
                           )
                         ],
                       ),

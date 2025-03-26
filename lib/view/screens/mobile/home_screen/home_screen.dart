@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
@@ -6,8 +7,9 @@ import 'package:orca_social_media/constants/images.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/fetch_datas_controller.dart';
-
+import 'package:orca_social_media/controllers/notification_controller.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/messages.dart';
+import 'package:orca_social_media/view/screens/mobile/home_screen/notification_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/user_postview.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_appbar.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_carousel.dart';
@@ -19,10 +21,28 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
   });
- 
+
   Future<void> _handleRefresh(BuildContext context) async {
     Provider.of<FetchUpcomingCourses>(context, listen: false);
   }
+
+  Stream<int> fetchNotificationCount(String userId, BuildContext context) {
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(userId)
+      .snapshots()
+      .map((snapshot) {
+    final List<dynamic> followersIds = snapshot.data()?['followers'] ?? [];
+    final int unreadNotifications = followersIds.length;
+
+    // Update provider
+    Provider.of<NotificationProvider>(context, listen: false)
+        .updateNotificationCount(unreadNotifications);
+
+    return unreadNotifications;
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +55,46 @@ class HomeScreen extends StatelessWidget {
         centerTitle: true,
         title: Image.asset(
           AppImages.orcaLogoTrans,
-          height: mediaQuery.screenHeight * 0.02,  // 60
+          height: mediaQuery.screenHeight * 0.07, // 60
         ),
         actions: [
+          Consumer<NotificationProvider>(
+  builder: (context, notificationProvider, child) {
+    return Stack(
+      children: [
+        IconButton(
+          onPressed: () {
+            notificationProvider.resetNotificaionCount(); // Reset count when opening
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => NotificationScreen(userId: currentUser!),
+            ));
+          },
+          icon: Icon(Icons.notifications),
+        ),
+        if (notificationProvider.notificationCount > 0)
+          Positioned(
+            right: 8,
+            top: 1,
+            child: Container(
+              padding: EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                notificationProvider.notificationCount.toString(),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+      ],
+    );
+  },
+),
+
           IconButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
@@ -48,7 +105,7 @@ class HomeScreen extends StatelessWidget {
               },
               icon: Icon(
                 Icons.message,
-              ))
+              )),
         ],
       ),
       body: LiquidPullToRefresh(
@@ -82,7 +139,7 @@ class HomeScreen extends StatelessWidget {
                       ));
                 } else {
                   return const UpcomeingCourseCarousel();
-                } 
+                }
               }),
               SizedBox(
                 height: mediaQuery.screenHeight * 0.02,

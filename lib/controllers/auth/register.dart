@@ -36,28 +36,24 @@ class UserProvider with ChangeNotifier {
     return user?.uid;
   }
 
- UserModel? _currentUserDetails;
+  UserModel? _currentUserDetails;
 
- UserModel? get currentUserDetails => _currentUserDetails;
+  UserModel? get currentUserDetails => _currentUserDetails;
 
- Future<void> fetchCurrentUserDetails()async{
-  try{
-    User? currentUser = _auth.currentUser;
-    if(currentUser != null){
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc(currentUser.uid).get();
-      if(userDoc.exists){
-        _currentUserDetails = UserModel.fromMap(userDoc.data() as Map<String , dynamic>);
-        notifyListeners();
-      } 
-    }
-
-  }catch (e){
-
+  Future<void> fetchCurrentUserDetails() async {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(currentUser.uid).get();
+        if (userDoc.exists) {
+          _currentUserDetails =
+              UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
+          notifyListeners();
+        }
+      }
+    } catch (e) {}
   }
- }
-
-
-
 
   //--------------------------------FetchSingleUser------------------------------------//
 
@@ -212,7 +208,8 @@ class UserProvider with ChangeNotifier {
           likedUser: [],
           likesCount: 0,
           isDisabled: false,
-          isOnline: false);
+          isOnline: false, 
+          unreadNotification: 0);
 
       await _firestore
           .collection('users')
@@ -504,11 +501,9 @@ class UserProvider with ChangeNotifier {
           id: postId,
           userId: currentUser.uid,
           image: imageUrl ?? '',
-      
           caption: caption,
           date: DateFormat('MMM,d,yyyy').format(DateTime.now()),
           likedUsers: [],
-        
         );
 
         await _firestore

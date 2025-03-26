@@ -111,67 +111,71 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           ),
                           subtitle: Row(
                             children: [
-                              isUnread
-                                  ? Text.rich(
-                                      TextSpan(
-                                        text: lastMessage != null
-                                            ? (lastMessage.msg.length > 5
-                                                ? lastMessage.msg
-                                                    .substring(0, 5)
-                                                : lastMessage.msg)
-                                            : 'Say',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        children: [
-                                          if (lastMessage != null &&
-                                              lastMessage.msg.length > 5)
-                                            WidgetSpan(
-                                              child: Text(
-                                                "......",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    )
-                                  : Text.rich(
-                                      TextSpan(
-                                        text: lastMessage != null
-                                            ? (lastMessage.msg.length > 10
-                                                ? lastMessage.msg
-                                                    .substring(0, 10)
-                                                : lastMessage.msg)
-                                            : 'Say Hii 👋',
-                                        style: TextStyle(
-                                          
-                                          color: Colors.grey.shade600,
-                                        ),
-                                        children: [
-                                          if (lastMessage != null &&
-                                              lastMessage.msg.length > 10)
-                                            WidgetSpan(
-                                              child: Text(
-                                                "......",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                              if (isUnread)
+                                Text.rich(
+                                  TextSpan(
+                                    text: lastMessage != null
+                                        ? (lastMessage.msg.length > 5
+                                            ? lastMessage.msg.substring(0, 5)
+                                            : lastMessage.msg)
+                                        : 'Say Hi 👋',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
                                     ),
+                                    children: [
+                                      if (lastMessage != null &&
+                                          lastMessage.msg.length > 5)
+                                        const WidgetSpan(
+                                          child: Text(
+                                            "......",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              else
+                                lastMessage != null
+                                    ? lastMessage.type == Type.image
+                                        ? const Text(
+                                            'Image',
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          )
+                                        : Text.rich(
+                                            TextSpan(
+                                              text: lastMessage.msg.length > 10
+                                                  ? lastMessage.msg
+                                                      .substring(0, 10)
+                                                  : lastMessage.msg,
+                                              style: TextStyle(
+                                                  color: Colors.grey.shade600),
+                                              children: [
+                                                if (lastMessage.msg.length > 10)
+                                                  const WidgetSpan(
+                                                    child: Text(
+                                                      "......",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          )
+                                    : const Text('Say Hi 👋'),
                             ],
-                          ), 
+                          ),
                           trailing: isUnread
                               ? Container(
                                   width: 15,

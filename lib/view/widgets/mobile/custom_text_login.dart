@@ -22,8 +22,10 @@ class CustonTextLogin extends StatelessWidget {
           child: Text(
             'Log in',
             style: TextStyle(
-                color: AppColors.oRloginblue,
-                fontSize: mediaQuery.screenWidth * 0.03
+                
+                color: AppColors.oRBlack,
+                fontSize: mediaQuery.screenWidth * 0.03,
+                fontWeight: FontWeight.bold
                 // Responsive font size for text
                 ),
           ),

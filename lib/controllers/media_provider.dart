@@ -198,11 +198,6 @@ class MediaProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> refresh() async {
-    await Future.delayed(Duration(seconds: 1));
-    notifyListeners();
-  }
-
   Future<Map<String, dynamic>?> fetchUserAndPosts() async {
     try {
       User? currentUser = _auth.currentUser;
@@ -254,7 +249,8 @@ class MediaProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Future<void> fetchFollowingsWithLatestPost(String userId) async {
+  Future<void> fetchFollowingsWithLatestPost(
+      String userId  ) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -288,7 +284,13 @@ class MediaProvider extends ChangeNotifier {
 
             // Include the latest post if available
             if (postSnapshot.docs.isNotEmpty) {
-              followingData['latestPost'] = postSnapshot.docs.first.data();
+              // followingData['latestPost'] = postSnapshot.docs.first.data();
+              // followingData['latestPost']['id'] = postSnapshot.docs.first.id;
+
+              followingData['latestPost'] = {
+                'id':postSnapshot.docs.first.id,
+                ...postSnapshot.docs.first.data() as Map<String , dynamic>
+              };
             } else {
               followingData['latestPost'] = null;
             }
@@ -306,7 +308,7 @@ class MediaProvider extends ChangeNotifier {
       _isLoading = false;
     }
     notifyListeners();
-  } 
+  }
 
   //now modified
 
@@ -336,6 +338,11 @@ class MediaProvider extends ChangeNotifier {
         'likedUsers': FieldValue.arrayRemove([currentUser.email])
       });
     }
+  }
+
+  Future<void> refresh() async {
+    await Future.delayed(Duration(seconds: 1));
+    notifyListeners();
   }
 
 //

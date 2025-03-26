@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/bottom_nav_screen.dart';
 import 'package:orca_social_media/constants/media_query.dart';
@@ -35,22 +36,22 @@ class LoginForm extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                NewCustomTextFormField(
-                  controller: emailController,
+                CustomTextField(
+                  controller: emailController, 
                   labelText: 'Email',
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) => ValidationUtils.validateemail(value),
-                ),
+                  validator: (value) =>ValidationUtils.validateemail(value)
+                  ),
                 SizedBox(
                   height: mediaQuery.screenHeight * 0.02,
                 ),
-                NewCustomTextFormField(
+                CustomTextField(
                   controller: passwordController,
-                  labelText: 'Password',
-                  validator: (value) =>
-                      ValidationUtils.validate(value, 'Password'),
-                  isPassword: true,
-                ),
+                   labelText: 'Password',
+                   validator: (value) => ValidationUtils.validate(value, 'Password'),
+                   isPassword: true,
+                   ),
+                
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -60,7 +61,9 @@ class LoginForm extends StatelessWidget {
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => const ForgotPassword()));
                         },
-                        child: const Text('Password ?'))
+                        child: const Text('Password ?',style: TextStyle(
+                          color: Colors.black
+                        ),))
                   ],
                 ),
                 Padding(
@@ -69,7 +72,7 @@ class LoginForm extends StatelessWidget {
                     bottom: mediaQuery.screenHeight * 0.01,
                   ),
                   child: CustomButton(
-                    onPressed: loadingProvider.isLoading
+                    onTap: loadingProvider.isLoading
                         ? null
                         : () async {
                             if (formkey.currentState?.validate() == true) {
@@ -114,14 +117,15 @@ class LoginForm extends StatelessWidget {
                               }
                             }
                           },
-                    buttonText: loadingProvider.isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('Login'), // Set text when not loading
+                    buttontext: loadingProvider.isLoading
+                        ? const CustomLoadingButton()
+                        :Text('Login', style:TextStyle(color: Colors.white), // Set text when not loading
 
                     // Default Text if not loading
                   ),
                 ),
-              ],
+                )
+              ]
             ),
           );
         },

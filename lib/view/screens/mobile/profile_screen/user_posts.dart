@@ -38,7 +38,7 @@ class UserPosts extends StatelessWidget {
             child: Text('No Posts Available'),
           );
         }
-
+  
         // final posts = snapshot.data![0];
         final user = snapshot.data!['user'] as UserModel;
         final posts = snapshot.data!['posts'] as List<PostModel>;
@@ -235,7 +235,7 @@ void editCaptionDialog(BuildContext context,
       );
     },
   );
-}
+} 
 
 Future<void> _handleRefresh(BuildContext context) async {
   final userProvider = Provider.of<UserProvider>(context, listen: false);

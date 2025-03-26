@@ -38,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final mediaQuery = MediaQueryHelper(context);
 
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       resizeToAvoidBottomInset: true,
       appBar: CustomAppbar(
         title: Image.asset(
@@ -59,21 +60,25 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: mediaQuery.screenWidth * 0.07,
-                      top: mediaQuery.screenHeight * 0.13,
+                  SizedBox(
+                    height: mediaQuery.screenHeight * 0.04,
+                  ),
+                  Icon(
+                    Icons.lock,
+                    size: mediaQuery.screenWidth * 0.15,
+                  ),
+                  SizedBox(
+                    height: mediaQuery.screenHeight * 0.02,
+                  ),
+                  Text(
+                    'Log in',
+                    style: TextStyle(
+                      fontSize: 27,
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Log in',
-                        style: TextStyle(
-                          fontSize: 27,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                  ),
+                  SizedBox(
+                    height: 10, 
                   ),
                   SizedBox(
                     height: mediaQuery.screenHeight * 0.04,

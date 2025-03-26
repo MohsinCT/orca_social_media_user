@@ -29,97 +29,104 @@ class _SignUpMobileState extends State<SignUpMobile> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
     final imagePickerProvider = Provider.of<ImagePickerProvider>(context);
-    return Scaffold(
-      appBar: CustomAppbar(
-        title: Image.asset(
-          AppImages.orcaLogoTrans,
-          height: 60,
+    return GestureDetector(
+      onTap: (){
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+         backgroundColor: Colors.grey[300],
+        appBar: CustomAppbar(
+         
+          title: Image.asset(
+            AppImages.orcaLogoTrans,
+            height: 60,
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.only(
-                top: mediaQuery.screenHeight * 0.0,
-                left: mediaQuery.screenWidth * 0.03,
-                right: mediaQuery.screenWidth * 0.03),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: mediaQuery.screenWidth * 0.07,
-                    top: mediaQuery.screenHeight * 0.03,
-                  ),
-                  child: const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Sign up',
-                      style:
-                          TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: mediaQuery.screenHeight * 0.0,
+                  left: mediaQuery.screenWidth * 0.03,
+                  right: mediaQuery.screenWidth * 0.03),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: mediaQuery.screenWidth * 0.07,
+                      top: mediaQuery.screenHeight * 0.03,
                     ),
-                  ),
-                ),
-                Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundImage: imagePickerProvider.selectedImage != null
-                          ? FileImage(imagePickerProvider.selectedImage!)
-                          : const AssetImage('assets/default_person.avif')
-                              as ImageProvider,
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          _showImagePickerDialog(context, imagePickerProvider);
-                        },
-                        child: const Text(
-                          'Add image',
-                          style: TextStyle(color: Colors.black),
-                        )),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: mediaQuery.screenHeight * 0.02,
-                        horizontal: mediaQuery.screenWidth * 0.05,
+                    child: const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Sign up',
+                        style:
+                            TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
                       ),
-                      child: Column(
-                        children: [
-                          UserFormPage(
-                              usernameController: usernameController,
-                              emailController: emailController,
-                              passwordController: passwordController,
-                              formkey: _formkey,
-                              conformController: conformpassController),
-                          Padding(
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundImage: imagePickerProvider.selectedImage != null
+                            ? FileImage(imagePickerProvider.selectedImage!)
+                            : const AssetImage('assets/default_person.avif')
+                                as ImageProvider,
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            _showImagePickerDialog(context, imagePickerProvider);
+                          },
+                          child: const Text(
+                            'Add image',
+                            style: TextStyle(color: Colors.black),
+                          )),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: mediaQuery.screenHeight * 0.02,
+                          horizontal: mediaQuery.screenWidth * 0.05,
+                        ),
+                        child: Column(
+                          children: [
+                            UserFormPage(
+                                usernameController: usernameController,
+                                emailController: emailController,
+                                passwordController: passwordController,
+                                formkey: _formkey,
+                                confirmController: conformpassController),
+                            Padding(
+                                padding: EdgeInsets.only(
+                                    top: mediaQuery.screenHeight * 0.03,
+                                    bottom: mediaQuery.screenHeight * 0.01),
+                                child: SignUpButton(
+                                    formKey: _formkey,
+                                    usernameController: usernameController,
+                                    emailController: emailController,
+                                    image: imagePickerProvider.selectedImage,
+                                    passwordController: passwordController)),
+                            const CustomDivider(),
+                            Padding(
                               padding: EdgeInsets.only(
-                                  top: mediaQuery.screenHeight * 0.03,
-                                  bottom: mediaQuery.screenHeight * 0.01),
-                              child: SignUpButton(
-                                  formKey: _formkey,
-                                  usernameController: usernameController,
-                                  emailController: emailController,
-                                  image: imagePickerProvider.selectedImage,
-                                  passwordController: passwordController)),
-                          const CustomDivider(),
-                          Padding(
-                            padding: EdgeInsets.only(
-                              top: mediaQuery.screenHeight * 0.01,
+                                top: mediaQuery.screenHeight * 0.01,
+                              ),
+                              child: GoogleSignUp(
+                                  onTap: () {}, text: 'Sign up with Google'),
                             ),
-                            child: GoogleSignUp(
-                                onTap: () {}, text: 'Sign up with Google'),
-                          ),
-                          CustonTextLogin(
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (ctx) => LoginScreen()));
-                            },
-                          )
-                        ],
+                            CustonTextLogin(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (ctx) => LoginScreen()));
+                              },
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                )
-              ],
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
         ),

@@ -18,9 +18,10 @@ class UserModel {
   final List<String> followers;
   final List<String> followings;
   final bool isDisabled;
-  final List<String> likedUser; // New field for list of liked users
-  final int likesCount;         // New field for the count of likes
- 
+  final List<String> likedUser;
+  final int likesCount;
+  final int unreadNotification; // New field added
+
   UserModel({
     required this.id,
     required this.isOnline,
@@ -39,8 +40,9 @@ class UserModel {
     required this.followers,
     required this.followings,
     required this.isDisabled,
-    required this.likedUser,   // Added in constructor
-    required this.likesCount,  // Added in constructor
+    required this.likedUser,
+    required this.likesCount,
+    required this.unreadNotification, // Added in constructor
   });
 
   // Convert the model to a Map for storage
@@ -63,8 +65,9 @@ class UserModel {
       'followings': followings,
       'isOnline': isOnline,
       'isDisabled': isDisabled,
-      'likedUser': likedUser,   // Added in toMap
-      'likesCount': likesCount, // Added in toMap
+      'likedUser': likedUser,
+      'likesCount': likesCount,
+      'unreadNotification': unreadNotification, // Added in toMap
     };
   } 
 
@@ -88,8 +91,9 @@ class UserModel {
       followings: List.from(map['followings'] ?? []),
       isOnline: map['isOnline'] ?? false,
       isDisabled: map['isDisabled'] ?? false,
-      likedUser: List.from(map['likedUser'] ?? []), // Safely extract likedUser list
-      likesCount: map['likesCount'] ?? 0,           // Safely extract likesCount
+      likedUser: List.from(map['likedUser'] ?? []),
+      likesCount: map['likesCount'] ?? 0,
+      unreadNotification: map['unreadNotification'] ?? 0, // Added in fromMap
     );
   }
 
@@ -113,8 +117,9 @@ class UserModel {
       followers: List.from(doc['followers'] ?? []),
       followings: List.from(doc['followings'] ?? []),
       isDisabled: doc['isDisabled'] ?? false,
-      likedUser: List.from(doc['likedUser'] ?? []), // Safely extract likedUser list
-      likesCount: doc['likesCount'] ?? 0,           // Safely extract likesCount
+      likedUser: List.from(doc['likedUser'] ?? []),
+      likesCount: doc['likesCount'] ?? 0,
+      unreadNotification: doc['unreadNotification'] ?? 0, // Added in fromDocument
     );
   }
 }
