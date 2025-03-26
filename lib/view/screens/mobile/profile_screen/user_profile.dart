@@ -6,7 +6,8 @@ import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/counter.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/add_story.dart';
 import 'package:orca_social_media/view/screens/mobile/post_screen/post_screen.dart';
-import 'package:orca_social_media/view/screens/mobile/profile_screen/settings_screen.dart';
+import 'package:orca_social_media/view/screens/mobile/profile_screen/settings/settings_screen.dart';
+
 import 'package:orca_social_media/view/screens/mobile/profile_screen/user_post_show_dialog.dart';
 import 'package:orca_social_media/view/screens/mobile/profile_screen/user_posts.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_appbar.dart';
@@ -58,7 +59,7 @@ class ProfileScreen extends StatelessWidget {
             IconButton(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const SettingsScreen()));
+                      builder: (context) => SettingsScreen()));
                 },
                 icon: Icon(Icons.menu))
           ],

@@ -60,7 +60,7 @@ dependencies:
   animated_search_bar: ^2.8.0
   flutter_gemini: ^2.0.3
   dash_chat_2: ^0.0.20
-  webview_flutter: ^4.10.0
+  rename: ^3.0.2
   
   
   
