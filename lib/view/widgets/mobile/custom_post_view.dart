@@ -31,7 +31,7 @@ class CustomFollowingPostView extends StatefulWidget {
       required this.date,
       required this.profilPicture,
       required this.usernameForCaption,
-      this.latestPosts,
+      this.latestPosts = const {},
       required this.caption, required this.id});
 
   @override
@@ -93,7 +93,7 @@ class _CustomFollowingPostViewState extends State<CustomFollowingPostView> {
                 },
               ),
             ),
-            if (widget.latestPosts != null) ...[
+            if (widget.latestPosts != null && widget.latestPosts.isNotEmpty) ...[
               CachedNetworkImage(
                 imageUrl: widget.image,
                 fit: BoxFit.cover,
@@ -185,8 +185,11 @@ class _CustomFollowingPostViewState extends State<CustomFollowingPostView> {
                   ),
                 ],
               ),
-            ],
-          ],
+            ] 
+            else 
+                SizedBox.shrink()
+          ] 
+          ,
         ),
       ),
     );

@@ -249,66 +249,59 @@ class MediaProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Future<void> fetchFollowingsWithLatestPost(
-      String userId  ) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  Future<void> fetchFollowingsWithLatestPost(String userId) async {
+  _isLoading = true;
+  _errorMessage = null;
+  notifyListeners();
 
-    try {
-      List<Map<String, dynamic>> followingsDataWithPosts = [];
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-      final List<dynamic> followingsIds = userDoc.data()?['followings'] ?? [];
+  try {
+    List<Map<String, dynamic>> followingsDataWithPosts = [];
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .get();
+    final List<dynamic> followingsIds = userDoc.data()?['followings'] ?? [];
 
-      if (followingsIds.isNotEmpty) {
-        for (String followingsId in followingsIds) {
-          final followingsDoc = await FirebaseFirestore.instance
+    if (followingsIds.isNotEmpty) {
+      for (String followingsId in followingsIds) {
+        final followingsDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(followingsId)
+            .get();
+
+        if (followingsDoc.exists) {
+          QuerySnapshot postSnapshot = await FirebaseFirestore.instance
               .collection('users')
               .doc(followingsId)
+              .collection('posts')
+              .orderBy('date', descending: true)
+              .limit(1)
               .get();
 
-          if (followingsDoc.exists) {
-            // Fetch the latest post for this following user
-            QuerySnapshot postSnapshot = await FirebaseFirestore.instance
-                .collection('users')
-                .doc(followingsId)
-                .collection('posts')
-                .orderBy('date', descending: true)
-                .limit(1)
-                .get();
+          Map<String, dynamic> followingData = followingsDoc.data() ?? {};
 
-            Map<String, dynamic> followingData = followingsDoc.data()!;
+          followingData['latestPost'] = postSnapshot.docs.isNotEmpty
+              ? {
+                  'id': postSnapshot.docs.first.id,
+                  ...postSnapshot.docs.first.data() as Map<String, dynamic>
+                }
+              : {}; // Instead of `null`, assign an empty map to prevent `null` errors
 
-            // Include the latest post if available
-            if (postSnapshot.docs.isNotEmpty) {
-              // followingData['latestPost'] = postSnapshot.docs.first.data();
-              // followingData['latestPost']['id'] = postSnapshot.docs.first.id;
-
-              followingData['latestPost'] = {
-                'id':postSnapshot.docs.first.id,
-                ...postSnapshot.docs.first.data() as Map<String , dynamic>
-              };
-            } else {
-              followingData['latestPost'] = null;
-            }
-
-            followingsDataWithPosts.add(followingData);
-          }
+          followingsDataWithPosts.add(followingData);
         }
       }
-
-      _followingsDataWithPosts = followingsDataWithPosts;
-      _isLoading = false;
-    } catch (e) {
-      _errorMessage = 'Error fetching posts: $e';
-      debugPrint('Error fetching followings and latest posts: $e');
-      _isLoading = false;
     }
-    notifyListeners();
+
+    _followingsDataWithPosts = followingsDataWithPosts;
+    _isLoading = false;
+  } catch (e) {
+    _errorMessage = 'Error fetching posts: $e';
+    debugPrint('Error fetching followings and latest posts: $e');
+    _isLoading = false;
   }
+  notifyListeners();
+}
+
 
   //now modified
 

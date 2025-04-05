@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/mohsin/Development/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/mohsin/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/mohsin/Flutter/orca_social_media_one/android/app/.cxx/RelWithDebInfo/4d41oor3/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/mohsin/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/mohsin/Flutter/orca_social_media_one/android/app/.cxx/RelWithDebInfo/4d41oor3/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

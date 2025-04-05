@@ -51,14 +51,14 @@ class PostView extends StatelessWidget {
 
             return CustomFollowingPostView(
               id: userId,
-              userId: following['id'],
-              postId: latestPosts['id'],
-              username: following['username'],
-              image: latestPosts['image'],
-              date: latestPosts['date'],
+              userId: following['id'] ?? '',
+              postId: latestPosts['id'] ?? '' ,
+              username: following['username'] ?? '',
+              image: latestPosts['image'] ?? '',
+              date: latestPosts['date'] ?? '',
               profilPicture: following['profilePicture'],
               usernameForCaption: following['username'],
-              caption: latestPosts['caption'],
+              caption: latestPosts['caption'] ?? '',
               latestPosts: latestPosts,
             );
 

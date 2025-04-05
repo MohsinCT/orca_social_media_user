@@ -3,8 +3,10 @@ import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/auth_provider.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/login_shared_prefs.dart';
+import 'package:orca_social_media/view/screens/mobile/profile_screen/privacy_policy.dart';
 import 'package:orca_social_media/view/screens/mobile/profile_screen/report_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/profile_screen/saved_post_screen.dart';
+import 'package:orca_social_media/view/screens/mobile/profile_screen/terms_conditions_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/starting_page_screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -26,31 +28,41 @@ class SettingsScreen extends StatelessWidget {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(
-                  height: mediaQuery.screenHeight * 0.2,
-                  child: Column(
-                    children: [
-                      InkWell(
-                        onTap: (){
-                         Navigator.of(context).push(MaterialPageRoute(builder: (context) => SavedPostsScreen(userId: currentUser!)));
-                        },
-                        child: _customListTile(Icons.bookmark_added, 'Saved',
-                            Icons.arrow_forward_ios),
-                      ),
-                      InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ReportPage()));
-                          },
-                          child: _customListTile(Icons.report,
-                              'Report a problem', Icons.arrow_forward_ios)),
-                      _customListTile(Icons.info_outline_rounded, 'About',
-                          Icons.arrow_forward_ios),
-                    ],
-                  )),
+              //
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          SavedPostsScreen(userId: currentUser!)));
+                },
+                child: _customListTile(
+                    Icons.bookmark_added, 'Saved', Icons.arrow_forward_ios),
+              ),
+              InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => ReportPage()));
+                  },
+                  child: _customListTile(Icons.report, 'Report a problem',
+                      Icons.arrow_forward_ios)),
+              InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => TermsAndConditions()));
+                  },
+                  child: _customListTile(Icons.assignment, 'Terms & conditions',
+                      Icons.arrow_forward_ios)),
+
+              InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => PrivacyPolicy()));
+                  },
+                  child: _customListTile(Icons.policy, 'Privacy & policy',
+                      Icons.arrow_forward_ios)),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Column(
