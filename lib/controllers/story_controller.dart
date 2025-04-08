@@ -72,8 +72,8 @@ class StoryProvider extends ChangeNotifier {
       return;
     }
     try {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Uploading story....')));
+      // ScaffoldMessenger.of(context)
+      //     .showSnackBar(const SnackBar(content: Text('Uploading story....')));
 
       final fileName = const Uuid().v4();
       final storageRef = FirebaseStorage.instance
@@ -163,6 +163,51 @@ class StoryProvider extends ChangeNotifier {
       log('Failed to load stories: $e');
     }
   }
+
+
+  Future<void> deleteStory({
+  required String userId,
+  required String storyId,
+  required String imageUrl,
+  required BuildContext context,
+}) async {
+  try {
+   _isLoading = true;
+   notifyListeners();
+    final userStoriesRef =
+        _firestore.collection('users').doc(userId).collection('stories');
+
+    final snapshot = await userStoriesRef
+        .where('id', isEqualTo: storyId)
+        .get();
+
+    for (var doc in snapshot.docs) {
+      await doc.reference.delete();
+    }
+
+    // Delete image from Firebase Storage
+    final storageRef = FirebaseStorage.instance.refFromURL(imageUrl);
+    await storageRef.delete();
+
+    // Update local state
+    _stories.removeWhere((story) => story.id == storyId);
+    notifyListeners();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Story deleted successfully')),
+    );
+  } catch (e) {
+    log('Failed to delete story: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to delete story: $e')),
+    );
+    
+  } finally{
+    _isLoading = false;
+    notifyListeners();
+  }
+}
+
 
   //---------------story view --------------------//
 

@@ -1,12 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:orca_social_media/constants/media_query.dart';
-import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/story_controller.dart';
 import 'package:orca_social_media/controllers/story_state_controller.dart';
 import 'package:orca_social_media/models/story_model.dart';
-import 'package:orca_social_media/view/screens/mobile/network_screen/user_details.dart';
 import 'package:provider/provider.dart';
 
 class StoryScreen extends StatelessWidget {
@@ -17,7 +16,7 @@ class StoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Provider.of<StoryProvider>(context, listen: false).loadStories(userId!);
     final mediaQuery = MediaQueryHelper(context);
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    // final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -29,9 +28,7 @@ class StoryScreen extends StatelessWidget {
             builder: (context, storyStsProvider, storyProvider, child) {
               final stories = storyProvider.stories;
 
-              if (stories.isEmpty) {
-                // Return an empty widget temporarily
-              }
+              if (stories.isEmpty) {}
 
               return PageView.builder(
                 itemCount: stories.length,
@@ -71,16 +68,25 @@ class StoryScreen extends StatelessWidget {
                         ),
                       ),
                       // User Name
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          userProvider.user?.username ?? '',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+
+                      ListTile(
+                        trailing: IconButton(
+                            onPressed: () async {
+                              await storyProvider.deleteStory(
+                                  userId: userId!,
+                                  storyId: story.id,
+                                  imageUrl: story.image,
+                                  context: context);
+                              Navigator.of(context).pop();
+                            },
+                            icon: storyProvider.isLoading == true
+                                ? CupertinoActivityIndicator(
+                                    color: Colors.white,
+                                  )
+                                : Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  )),
                       ),
                       Container(
                         width: mediaQuery.screenWidth,

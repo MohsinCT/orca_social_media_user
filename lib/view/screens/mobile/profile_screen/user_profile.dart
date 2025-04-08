@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
 
-  final List<String> tabNames = ['Posts', 'Liked'];
+  final List<String> tabNames = ['Posts'];
 
   @override
   Widget build(BuildContext context) {

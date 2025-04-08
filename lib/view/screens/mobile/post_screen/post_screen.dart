@@ -1,9 +1,9 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/counter.dart';
-import 'package:orca_social_media/controllers/dummy_post_controller.dart';
 import 'package:orca_social_media/controllers/media_provider.dart';
 
 import 'package:provider/provider.dart';
@@ -24,7 +24,7 @@ class _PostScreenState extends State<PostScreen> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
     final postProvider = Provider.of<MediaProvider>(context, listen: false);
-    final dummyPost = Provider.of<DummyPostController>(context, listen: false);
+    // final dummyPost = Provider.of<DummyPostController>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -210,7 +210,7 @@ class _PostScreenState extends State<PostScreen> {
                             return AlertDialog(
                               content: Row(
                                 children: [
-                                  CircularProgressIndicator(),
+                                 CupertinoActivityIndicator(),
                                   SizedBox(
                                     width: mediaQuery.screenWidth * 0.07,
                                   ),
@@ -227,6 +227,7 @@ class _PostScreenState extends State<PostScreen> {
 
                       Provider.of<CounterProvider>(context, listen: false)
                           .increamentPostCount(userId);
+                      Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                     } catch (e) {

@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/story_controller.dart';
@@ -95,10 +96,31 @@ class _StoryAddingPageState extends State<StoryAddingPage> {
                                 content: Text('Please fill missing fields')));
                             return;
                           }
+
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  content: Row(
+                                    children: [
+                                      CupertinoActivityIndicator(),
+                                      SizedBox(
+                                        width: mediaQuery.screenWidth * 0.07,
+                                      ),
+                                      Text('Adding New Story'),
+                                    ],
+                                  ),
+                                );
+                              });
                           await storyProvider.uploadAndAddStory(
                               context: context,
                               userId: userid,
                               captionController: _captionController);
+
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
                         } catch (e) {
                           log('failed to add story....$e');
                         }

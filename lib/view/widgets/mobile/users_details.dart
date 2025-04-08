@@ -12,7 +12,6 @@ import 'package:orca_social_media/view/widgets/mobile/custom_follow_button.dart'
 import 'package:orca_social_media/view/widgets/mobile/custom_message_button.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_text.dart';
 import 'package:provider/provider.dart';
-
 import 'package:shimmer/shimmer.dart';
 
 class UsersDetails extends StatelessWidget {

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:orca_social_media/constants/media_query.dart';
-import 'package:orca_social_media/controllers/followings_controller.dart';
+import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/view/screens/mobile/network_screen/user_details.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_appbar.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_follow_button.dart';
@@ -33,8 +32,10 @@ class Followers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQueryHelper(context);
-    final followingsProvider = Provider.of<FollowingsProvider>(context , listen: false);
+    // final mediaQuery = MediaQueryHelper(context);
+    // final followingsProvider = Provider.of<FollowingsProvider>(context , listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final currentUser = userProvider.getLoggedUserId();
 
     return Scaffold(
       appBar: CustomAppbar(
@@ -43,23 +44,6 @@ class Followers extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Padding(
-          //   padding: EdgeInsets.symmetric(
-          //     vertical: mediaQuery.screenHeight * 0.02,
-          //     horizontal: mediaQuery.screenWidth * 0.02,
-          //   ),
-          //   // child: TextFormField(
-          //   //   onChanged: (value) => 
-          //   //   followingsProvider.filterFollowings(value),
-          //   //   decoration: InputDecoration(
-          //   //     prefixIcon: const Icon(Icons.search),
-          //   //     hintText: 'Search',
-          //   //     border: OutlineInputBorder(
-          //   //       borderRadius: BorderRadius.circular(10),
-          //   //     ),
-          //   //   ),
-          //   // ),
-          // ),
           Expanded(
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: fetchFollowers(userId),
@@ -82,32 +66,54 @@ class Followers extends StatelessWidget {
                   itemCount: followers.length,
                   itemBuilder: (context, index) {
                     final follower = followers[index];
-                    return InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                UserProfile(userId: follower['id'])));
-                      },
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(follower['profilePicture'] ?? ''),
-                          child: follower['profilePicture'] == null
-                              ? Text(
-                                  follower['username'][0].toUpperCase(),
-                                  style: const TextStyle(color: Colors.white),
-                                )
-                              : null,
-                        ),
-                        title: Text(follower['username'] ?? 'Unknown User'),
-                        subtitle: Text(follower['nickname'] == 'Add nickname'
-                            ? ''
-                            : follower['nickname']),
-                            trailing: FollowButton(userId: follower['id'] ,),
-                      ),
-                    );
+                    return follower['id'] == currentUser
+                        ? ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                  follower['profilePicture'] ?? ''),
+                              child: follower['profilePicture'] == null
+                                  ? Text(
+                                      follower['username'][0].toUpperCase(),
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    )
+                                  : null,
+                            ),
+                            title: Text(follower['username'] ?? 'Unknown User'),
+                            subtitle: Text(
+                                follower['nickname'] == 'Add nickname'
+                                    ? ''
+                                    : follower['nickname']),
+                            trailing: Text('You'))
+                        : InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      UserProfile(userId: follower['id'])));
+                            },
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    follower['profilePicture'] ?? ''),
+                                child: follower['profilePicture'] == null
+                                    ? Text(
+                                        follower['username'][0].toUpperCase(),
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      )
+                                    : null,
+                              ),
+                              title:
+                                  Text(follower['username'] ?? 'Unknown User'),
+                              subtitle: Text(
+                                  follower['nickname'] == 'Add nickname'
+                                      ? ''
+                                      : follower['nickname']),
+                              trailing: FollowButton(
+                                userId: follower['id'],
+                              ),
+                            ));
                   },
-                
                 );
               },
             ),
