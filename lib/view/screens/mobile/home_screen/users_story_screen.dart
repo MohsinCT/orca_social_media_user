@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/media_query.dart';
+// import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/story_controller.dart';
 import 'package:orca_social_media/controllers/story_state_controller.dart';
 import 'package:orca_social_media/models/story_model.dart';
@@ -8,12 +9,14 @@ import 'package:orca_social_media/view/screens/mobile/home_screen/story_screen.d
 import 'package:provider/provider.dart';
 
 class UsersStories extends StatelessWidget {
- final  String? userId;
-  const UsersStories({super.key, required this.userId});
+ final String? userId;
+ 
+  const UsersStories({super.key, required this.userId,});
 
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
+    // final userProvider = Provider.of<UserProvider>(context , listen: false).fetchUserById(userId!);
     Provider.of<StoryProvider>(context , listen: false).loadStories(userId!);
     return Scaffold(
       backgroundColor: Colors.black,
@@ -70,16 +73,22 @@ class UsersStories extends StatelessWidget {
                         ),
                       ),
                       // User Name
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          'Username',
+                      // Padding(
+                      //   padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      //   child: 
+                      // ),
+                      ListTile(
+                        leading: Text(
+                          '',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
+                        trailing: IconButton(onPressed: (){
+
+                        }, icon: Icon(Icons.more_vert, color: Colors.white,)),
                       ),
                       Container(
                         width: mediaQuery.screenWidth,

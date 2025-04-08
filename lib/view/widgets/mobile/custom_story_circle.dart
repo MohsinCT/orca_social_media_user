@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
+import 'package:orca_social_media/controllers/story_controller.dart';
 import 'package:orca_social_media/controllers/users_story_controller.dart';
 import 'package:orca_social_media/models/register_model.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/story_screen.dart';
@@ -177,45 +178,165 @@ class StoryCircle extends StatelessWidget {
                 } else {
                   // Other Users' Stories
                   final following = followings[index - 1];
-                  return Padding(
-                    padding:
-                        EdgeInsets.only(left: mediaQuery.screenWidth * 0.03),
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  UsersStories(userId: following['id']),
-                            ));
+                  return Column(
+                    children: [
+                      ChangeNotifierProvider(
+                        create: (_) =>
+                            StoryProvider()..loadStories(following['id']),
+                        child: Consumer<StoryProvider>(
+                          builder: (context, storyProvider, _) {
+                            final hasStory = storyProvider.stories.isNotEmpty;
+
+                            return Padding(
+                                padding: EdgeInsets.only(
+                                    left: mediaQuery.screenWidth * 0.00),
+                                child: hasStory
+                                    ? Column(
+                                        children: [
+                                          GestureDetector(
+                                              onTap: () {
+                                                if (hasStory) {
+                                                  storyProvider
+                                                      .markStoryAsViewed(
+                                                          following['id']);
+                                                  Navigator.of(context)
+                                                      .push(MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        UsersStories(
+                                                            userId: following[
+                                                                'id']),
+                                                  ));
+                                                }
+                                              },
+                                              child: Container(
+                                                width: mediaQuery.screenWidth *
+                                                    0.22,
+                                                height:
+                                                    mediaQuery.screenHeight *
+                                                        0.1,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  gradient: storyProvider
+                                                          .isStoryViewed(
+                                                              following['id'])
+                                                      ? const LinearGradient(
+                                                          colors: [
+                                                            Colors.grey,
+                                                            Colors.grey
+                                                          ], // Viewed color
+                                                        )
+                                                      : const LinearGradient(
+                                                          colors: [
+                                                            Colors.red,
+                                                            Colors.orange,
+                                                            Colors.yellow
+                                                          ],
+                                                          begin:
+                                                              Alignment.topLeft,
+                                                          end: Alignment
+                                                              .bottomRight,
+                                                        ),
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(6),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      image: DecorationImage(
+                                                        image:
+                                                            CachedNetworkImageProvider(
+                                                          following[
+                                                                  'profilePicture'] ??
+                                                              '',
+                                                        ),
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )),
+                                          SizedBox(
+                                              height: mediaQuery.screenHeight *
+                                                  0.01),
+                                          Text(
+                                            following['username'] ?? 'Unknown',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : SizedBox.shrink());
                           },
-                          child: Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              Container(
-                                width: mediaQuery.screenWidth * 0.22,
-                                height: mediaQuery.screenHeight * 0.1,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: CachedNetworkImageProvider(
-                                      following['profilePicture'] ?? '',
-                                    ),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
                         ),
-                        SizedBox(height: mediaQuery.screenHeight * 0.01),
-                        Text(
-                          following['username'] ?? 'Unknown',
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
+                      )
+
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     Navigator.of(context).push(MaterialPageRoute(
+                      //       builder: (context) =>
+                      //           UsersStories(userId: following['id'],),
+                      //     ));
+                      //   },
+                      //   child: Stack(
+                      //     alignment: AlignmentDirectional.center,
+                      //     children: [
+                      //       // Container(
+                      //       //   width: mediaQuery.screenWidth * 0.22,
+                      //       //   height: mediaQuery.screenHeight * 0.1,
+                      //       //   decoration: BoxDecoration(
+                      //       //     shape: BoxShape.circle,
+                      //       //     image: DecorationImage(
+                      //       //       image: CachedNetworkImageProvider(
+                      //       //         following['profilePicture'] ?? '',
+                      //       //       ),
+                      //       //       fit: BoxFit.cover,
+                      //       //     ),
+                      //       //   ),
+                      //       // ),
+
+                      //       Container(
+                      //         width: mediaQuery.screenWidth * 0.24,
+                      //         height: mediaQuery.screenWidth * 0.22,
+                      //         decoration: BoxDecoration(
+                      //           shape: BoxShape.circle,
+                      //           gradient: LinearGradient(
+                      //             colors: [
+                      //               Colors.red,
+                      //               Colors.orange,
+                      //               Colors.yellow
+                      //             ],
+                      //             begin: Alignment.topLeft,
+                      //             end: Alignment.bottomRight,
+                      //           ),
+                      //         ),
+                      //         child: Padding(
+                      //           padding: const EdgeInsets.all(
+                      //               6), // Adjust thickness of border
+                      //           child: Container(
+                      //             decoration: BoxDecoration(
+                      //               shape: BoxShape.circle,
+                      //               image: DecorationImage(
+                      //                 image: CachedNetworkImageProvider(
+                      //                     following['profilePicture'] ?? ''),
+                      //                 fit: BoxFit.cover,
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // SizedBox(height: mediaQuery.screenHeight * 0.01),
+                      // Text(
+                      //   following['username'] ?? 'Unknown',
+                      //   style: const TextStyle(
+                      //       fontSize: 14, fontWeight: FontWeight.w500),
+                      // ),
+                    ],
                   );
                 }
               },

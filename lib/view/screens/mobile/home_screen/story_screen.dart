@@ -6,6 +6,7 @@ import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/story_controller.dart';
 import 'package:orca_social_media/controllers/story_state_controller.dart';
 import 'package:orca_social_media/models/story_model.dart';
+import 'package:orca_social_media/view/screens/mobile/network_screen/user_details.dart';
 import 'package:provider/provider.dart';
 
 class StoryScreen extends StatelessWidget {
@@ -22,19 +23,16 @@ class StoryScreen extends StatelessWidget {
       backgroundColor: Colors.black,
       body: SafeArea(
         child: ChangeNotifierProvider(
-          create: (context) =>
-              StoryStateController(TickerProviderStateMixinImplementation(), context),
+          create: (context) => StoryStateController(
+              TickerProviderStateMixinImplementation(), context),
           child: Consumer2<StoryStateController, StoryProvider>(
             builder: (context, storyStsProvider, storyProvider, child) {
               final stories = storyProvider.stories;
 
               if (stories.isEmpty) {
-                return const Center(
-                  child: Text('No stories available' ,style: TextStyle(
-                    color: Colors.white
-                  ),),
-                );
+                // Return an empty widget temporarily
               }
+
               return PageView.builder(
                 itemCount: stories.length,
                 scrollDirection: Axis.horizontal,

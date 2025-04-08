@@ -17,6 +17,8 @@ class StoryProvider extends ChangeNotifier {
   XFile? get selectedImage => _selectedImage;
   CroppedFile? _croppedImg;
   CroppedFile? get croppedImg => _croppedImg;
+  bool? _isLoading = false;
+  bool? get isLoading => _isLoading;
   final ImagePicker picker = ImagePicker();
 
   Future<void> pickImage(bool pickImagesource) async {
@@ -82,20 +84,18 @@ class StoryProvider extends ChangeNotifier {
       final snapshot = await uploadTask.whenComplete(() => {});
       final storyUrl = await snapshot.ref.getDownloadURL();
 
-      final newStory = StoryModel
-      (id: fileName,
-       image: storyUrl,
-       caption: captionController.text.trim(), 
-       date: DateFormat('MMM,d,yyyy').format(DateTime.now())
-       );
+      final newStory = StoryModel(
+          id: fileName,
+          image: storyUrl,
+          caption: captionController.text.trim(),
+          date: DateFormat('MMM,d,yyyy').format(DateTime.now()));
 
-       await createStory(userId, newStory.toMap());
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Story uploaded successfully'))
-       );
-       await loadStories(userId);
+      await createStory(userId, newStory.toMap());
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Story uploaded successfully')));
+      await loadStories(userId);
 
-       resetImage();
+      resetImage();
     } catch (e) {
       log('Error uploading story....$e');
       ScaffoldMessenger.of(context)
@@ -137,8 +137,7 @@ class StoryProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<StoryModel>> fetchStories(
-      String userid) async {
+  Future<List<StoryModel>> fetchStories(String userid) async {
     try {
       final userDocRef = _firestore.collection('users').doc(userid);
       final QuerySnapshot storySnapshot =
@@ -156,12 +155,24 @@ class StoryProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> loadStories(String userId)async{
-    try{
+  Future<void> loadStories(String userId) async {
+    try {
       _stories = await fetchStories(userId);
       notifyListeners();
-    }catch (e){
+    } catch (e) {
       log('Failed to load stories: $e');
     }
+  }
+
+  //---------------story view --------------------//
+
+  Set<String> viewedUserIds = {};
+  void markStoryAsViewed(String userId) {
+    viewedUserIds.add(userId);
+    notifyListeners();
+  }
+
+  bool isStoryViewed(String userId) {
+    return viewedUserIds.contains(userId);
   }
 }

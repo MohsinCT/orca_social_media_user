@@ -8,7 +8,7 @@ class StoryStateController with ChangeNotifier {
   StoryStateController(TickerProvider vsync, BuildContext context) {
     _controller = AnimationController(
       vsync: vsync,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 7),
     );
 
     _animation = Tween<double>(begin: 0, end: 1).animate(_controller)

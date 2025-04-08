@@ -6,12 +6,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/controllers/chat_controller.dart';
 import 'package:orca_social_media/models/messages_model.dart';
+import 'package:orca_social_media/models/story_model.dart';
 
 class FollowingsController extends ChangeNotifier{
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
   User get user => auth.currentUser!;
   bool _isLoading = false;
+
+  List<StoryModel> _stories = [];
+List<StoryModel> get stories => _stories;
+
   List<Map<String, dynamic>> _followings = [];
   
 
@@ -52,6 +57,55 @@ class FollowingsController extends ChangeNotifier{
       notifyListeners();
     }
   }
+
+  Future<void> loadStoriesFromFollowings(String userId) async {
+  _isLoading = true;
+  notifyListeners();
+
+  try {
+    // Step 1: Get the user's followings
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .get();
+
+    final List<dynamic> followingsIds = userDoc.data()?['followings'] ?? [];
+
+    List<StoryModel> allStories = [];
+
+    // Step 2: Loop through each following and fetch their stories
+    for (String followingId in followingsIds) {
+      final storySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(followingId)
+          .collection('stories')
+          .get();
+
+      final userStories = storySnapshot.docs.map((doc) {
+        return StoryModel.fromMap(doc.data());
+      }).toList();
+
+      if (userStories.isNotEmpty) {
+        allStories.addAll(userStories);
+      }
+    }
+
+    // Optional: Sort stories by time if needed
+    // allStories.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+    _stories = allStories;
+    log('fetched');
+  } catch (e) {
+    log('Error loading followings stories: $e');
+  } finally {
+    _isLoading = false;
+    notifyListeners();
+  }
+}
+
+
+
+  
  
  String getConversationId(String id) => user.uid.hashCode <= id.hashCode
       ? '${user.uid}_$id'
