@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:orca_social_media/controllers/media_provider.dart';
-import 'package:provider/provider.dart';
 
 class CommentBottomSheet extends StatelessWidget {
   final String userId;
   final String postId;
-  const CommentBottomSheet({Key? key, required this.userId, required this.postId,}) : super(key: key);
+  const CommentBottomSheet({
+    super.key,
+    required this.userId,
+    required this.postId,
+  });
 
   @override
   Widget build(BuildContext context) {
-
-  final TextEditingController controller = TextEditingController();
-  final mediaProvider = Provider.of<MediaProvider>(context ,listen: false );
+    final TextEditingController controller = TextEditingController();
 
     return IconButton(
       icon: const Icon(Icons.comment),

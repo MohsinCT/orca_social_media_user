@@ -61,7 +61,7 @@ class UpcomeingCourseCarousel extends StatelessWidget {
                           bottomLeft: Radius.circular(15),
                           bottomRight: Radius.circular(15),
                         ),
-                        color: AppColors.oRBlack.withOpacity(0.5),
+                        color: AppColors.oRBlack.withValues(alpha: 0.5),
                       ),
                       width: mediaQuery.screenWidth * 0.8,
                       child: Text(

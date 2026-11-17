@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/counter.dart';
-import 'package:orca_social_media/controllers/dummy_post_controller.dart';
 import 'package:orca_social_media/controllers/media_provider.dart';
 
 import 'package:provider/provider.dart';
@@ -11,7 +10,7 @@ import 'package:provider/provider.dart';
 
 class PostScreen extends StatefulWidget {
   final String? userId;
-  PostScreen({super.key, required this.userId});
+  const PostScreen({super.key, required this.userId});
 
   @override
   State<PostScreen> createState() => _PostScreenState();
@@ -24,7 +23,6 @@ class _PostScreenState extends State<PostScreen> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
     final postProvider = Provider.of<MediaProvider>(context, listen: false);
-    final dummyPost = Provider.of<DummyPostController>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(

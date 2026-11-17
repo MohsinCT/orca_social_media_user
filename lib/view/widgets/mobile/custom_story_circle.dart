@@ -14,7 +14,7 @@ import 'package:shimmer/shimmer.dart';
 class StoryCircle extends StatelessWidget {
   final String userId;
 
-  const StoryCircle({Key? key, required this.userId}) : super(key: key);
+  const StoryCircle({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +23,11 @@ class StoryCircle extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (_) => FollowingsController()..fetchFollowings(userId)),
+          create: (_) => FollowingsController()..fetchFollowings(userId),
+        ),
         ChangeNotifierProvider(
-            create: (_) => UserProvider()..fetchUserDetails()),
+          create: (_) => UserProvider()..fetchUserDetails(),
+        ),
       ],
       child: Consumer2<FollowingsController, UserProvider>(
         builder: (context, followingsProvider, userProvider, child) {
@@ -44,15 +46,18 @@ class StoryCircle extends StatelessWidget {
                 if (index == 0) {
                   // Current User Story
                   return Padding(
-                    padding:
-                        EdgeInsets.only(left: mediaQuery.screenWidth * 0.03),
+                    padding: EdgeInsets.only(
+                      left: mediaQuery.screenWidth * 0.03,
+                    ),
                     child: Column(
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => StoryScreen(userId: userId),
-                            ));
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => StoryScreen(userId: userId),
+                              ),
+                            );
                           },
                           child: Stack(
                             alignment: Alignment.center,
@@ -64,9 +69,10 @@ class StoryCircle extends StatelessWidget {
                                       ConnectionState.waiting) {
                                     return Shimmer.fromColors(
                                       baseColor: AppColors.oRLightGrey
-                                          .withOpacity(0.5),
-                                      highlightColor:
-                                          Colors.white.withOpacity(0.3),
+                                          .withValues(alpha: 0.5),
+                                      highlightColor: Colors.white.withValues(
+                                        alpha: 0.3,
+                                      ),
                                       child: Stack(
                                         alignment: Alignment.center,
                                         children: [
@@ -84,12 +90,15 @@ class StoryCircle extends StatelessWidget {
                                             Positioned(
                                               right:
                                                   mediaQuery.screenWidth * 0.01,
-                                              bottom: mediaQuery.screenHeight *
+                                              bottom:
+                                                  mediaQuery.screenHeight *
                                                   0.01,
                                               child: Container(
-                                                width: mediaQuery.screenWidth *
+                                                width:
+                                                    mediaQuery.screenWidth *
                                                     0.06,
-                                                height: mediaQuery.screenWidth *
+                                                height:
+                                                    mediaQuery.screenWidth *
                                                     0.06,
                                                 decoration: const BoxDecoration(
                                                   color: AppColors.oRBlack,
@@ -124,23 +133,23 @@ class StoryCircle extends StatelessWidget {
                                         ),
                                       ),
                                       // ignore: unnecessary_null_comparison
-                                      child: user.profilPicture == null ||
-                                              user.profilPicture.isEmpty
-                                          ? Shimmer.fromColors(
-                                              baseColor: AppColors.oRLightGrey
-                                                  // ignore: deprecated_member_use
-                                                  .withOpacity(0.5),
-                                              highlightColor:
-                                                  // ignore: deprecated_member_use
-                                                  Colors.white.withOpacity(0.3),
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: AppColors.oRLightGrey,
+                                      child:
+                                          user.profilPicture == null ||
+                                                  user.profilPicture.isEmpty
+                                              ? Shimmer.fromColors(
+                                                baseColor: AppColors.oRLightGrey
+                                                    .withValues(alpha: 0.5),
+                                                highlightColor: Colors.white
+                                                    .withValues(alpha: 0.3),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color:
+                                                        AppColors.oRLightGrey,
+                                                  ),
                                                 ),
-                                              ),
-                                            )
-                                          : null, // No shimmer if the picture is available
+                                              )
+                                              : null, // No shimmer if the picture is available
                                     );
                                   }
                                 },
@@ -169,7 +178,9 @@ class StoryCircle extends StatelessWidget {
                         const Text(
                           'Your Story',
                           style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
@@ -178,16 +189,20 @@ class StoryCircle extends StatelessWidget {
                   // Other Users' Stories
                   final following = followings[index - 1];
                   return Padding(
-                    padding:
-                        EdgeInsets.only(left: mediaQuery.screenWidth * 0.03),
+                    padding: EdgeInsets.only(
+                      left: mediaQuery.screenWidth * 0.03,
+                    ),
                     child: Column(
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  UsersStories(userId: following['id']),
-                            ));
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        UsersStories(userId: following['id']),
+                              ),
+                            );
                           },
                           child: Stack(
                             alignment: AlignmentDirectional.center,
@@ -212,7 +227,9 @@ class StoryCircle extends StatelessWidget {
                         Text(
                           following['username'] ?? 'Unknown',
                           style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),

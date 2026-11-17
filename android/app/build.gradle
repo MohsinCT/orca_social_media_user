@@ -29,39 +29,31 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.example.orca_social_media"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-    jvmTarget = '1.8'
-    //1.8
-}
 
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
 
     defaultConfig {
         applicationId = "com.example.orca_social_media"
-        // Update minSdkVersion to 23
-        minSdkVersion 23
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 24
+        targetSdk = 36
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }
 
-    android {
-    // ...
-
-    
     buildTypes {
         release {
-            signingConfig = signingConfigs.debug  // Replace with release signing config if necessary
+            signingConfig = signingConfigs.debug // Replace with release signing config if necessary
         }
     }
-
-}
 }
 
 flutter {

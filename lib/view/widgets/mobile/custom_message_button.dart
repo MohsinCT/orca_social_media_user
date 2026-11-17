@@ -1,8 +1,8 @@
-import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/follow_button_controller.dart';
+import 'package:orca_social_media/models/messages_model.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/chat_screen.dart';
 import 'package:provider/provider.dart';
 

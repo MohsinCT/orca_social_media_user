@@ -1,16 +1,9 @@
-import 'dart:ui';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
-import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/models/register_model.dart';
-
 import 'package:orca_social_media/view/widgets/mobile/custom_user_shimmer.dart';
 import 'package:orca_social_media/view/widgets/mobile/users_details.dart';
 import 'package:provider/provider.dart';
-import 'package:shimmer/shimmer.dart';
 
 class UserDetails extends StatelessWidget {
   const UserDetails({super.key});
@@ -19,7 +12,7 @@ class UserDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     // final mediaQuery = MediaQueryHelper(context);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-      
+
     return FutureBuilder<UserModel?>(
       future: userProvider.fetchUserDetails(),
       builder: (context, snapshot) {
@@ -31,17 +24,18 @@ class UserDetails extends StatelessWidget {
           final user = snapshot.data!;
 
           return UsersDetails(
-              user: user,
-              userImage: user.profilPicture,
-              username: user.username,
-              nickname: user.nickname,
-              bio: user.bio,
-              location: user.location,
-              date: user.date,
-              followersCount: user.followersCount,
-              followingCount: user.followingCount,
-              userId: user.id,
-              postCount: user.postCount);
+            user: user,
+            userImage: user.profilPicture,
+            username: user.username,
+            nickname: user.nickname,
+            bio: user.bio,
+            location: user.location,
+            date: user.date,
+            followersCount: user.followersCount,
+            followingCount: user.followingCount,
+            userId: user.id,
+            postCount: user.postCount,
+          );
 
           // return Column(
           //   crossAxisAlignment: CrossAxisAlignment.center,
@@ -183,165 +177,4 @@ class UserDetails extends StatelessWidget {
       },
     );
   }
-}
-
-Widget _buildShimmerEffect(MediaQueryHelper mediaQuery) {
-  return SingleChildScrollView(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding:
-              EdgeInsets.symmetric(vertical: mediaQuery.screenHeight * 0.04),
-          child: ListTile(
-            leading: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: CircleAvatar(
-                maxRadius: 40,
-                backgroundColor: Colors.grey[300],
-              ),
-            ),
-            trailing: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Container(
-                width: 70,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            height: 20,
-            width: mediaQuery.screenWidth * 0.5,
-            color: Colors.grey[300],
-          ),
-        ),
-        SizedBox(height: mediaQuery.screenHeight * 0.02),
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            height: 15,
-            width: mediaQuery.screenWidth * 0.3,
-            color: Colors.grey[300],
-          ),
-        ),
-        SizedBox(height: mediaQuery.screenHeight * 0.02),
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            height: 60,
-            width: double.infinity,
-            color: Colors.grey[300],
-          ),
-        ),
-        SizedBox(height: mediaQuery.screenHeight * 0.02),
-        Row(
-          children: List.generate(
-            3,
-            (index) => Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: mediaQuery.screenWidth * 0.03),
-              child: Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(
-                  height: 15,
-                  width: mediaQuery.screenWidth * 0.2,
-                  color: Colors.grey[300],
-                ),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: mediaQuery.screenHeight * 0.02),
-        ListTile(
-          leading: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Icon(Icons.location_on, color: Colors.grey[300]),
-          ),
-          title: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              height: 12,
-              width: double.infinity,
-              color: Colors.grey[300],
-            ),
-          ),
-        ),
-        ListTile(
-          leading: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Icon(Icons.card_membership, color: Colors.grey[300]),
-          ),
-          title: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              height: 12,
-              width: double.infinity,
-              color: Colors.grey[300],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-void _showAvatarDetail(BuildContext context, String imageUrl) {
-  showDialog(
-    barrierDismissible: true,
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.zero, // Ensures the dialog fills the screen
-        child: Stack(
-          children: [
-            // Blurred background
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 13, sigmaY: 10),
-                child: Container(color: Colors.black.withOpacity(0.6)),
-              ),
-            ),
-            // Centered avatar image
-            Center(
-              child: CircleAvatar(
-                radius: MediaQuery.of(context).size.width *
-                    0.4, // Adjust the radius
-                backgroundColor: Colors.transparent, // Transparent background
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: imageUrl,
-                    fit: BoxFit.cover,
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    height: MediaQuery.of(context).size.width * 0.8,
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error, size: 60),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
 }

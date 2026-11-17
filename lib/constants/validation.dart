@@ -1,5 +1,5 @@
 class ValidationUtils {
-  static var validateUsername;
+  static String? Function(String?)? validateUsername;
 
   static String? validate(String? value, String fieldName) {
     if (value == null || value.isEmpty) {

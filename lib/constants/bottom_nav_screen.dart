@@ -48,7 +48,7 @@ class BottomNavScreen extends StatelessWidget {
               _buildNavItem(
                   Icons.person, "Profile", provider.currentIndex == 3),
             ],
-            color: Colors.black.withOpacity(0.9), // Make the curved portion fully transparent
+            color: Colors.black.withValues(alpha: 0.9), // Make the curved portion semi-transparent
             buttonBackgroundColor:
                 Colors.transparent, // Transparent button background
             backgroundColor: Colors

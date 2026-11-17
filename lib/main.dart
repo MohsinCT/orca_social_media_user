@@ -1,3 +1,7 @@
+import 'dart:developer';
+import 'dart:ui';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:orca_social_media/constants/colors.dart';
@@ -23,7 +27,6 @@ import 'package:orca_social_media/controllers/notification_controller.dart';
 import 'package:orca_social_media/controllers/save_post_controller.dart';
 import 'package:orca_social_media/controllers/search_controller.dart';
 import 'package:orca_social_media/controllers/story_controller.dart';
-import 'package:orca_social_media/controllers/story_state_controller.dart';
 import 'package:orca_social_media/controllers/tab_bar_controller.dart';
 import 'package:orca_social_media/controllers/textfield_provider.dart';
 import 'package:orca_social_media/firebase_options.dart';
@@ -31,16 +34,42 @@ import 'package:orca_social_media/models/auth_repository.dart';
 import 'package:orca_social_media/view/screens/mobile/splash_screen/splash_screen.dart';
 import 'package:orca_social_media/view/screens/mobile_or_web/sign_up.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
 
-void main() async {
-  Gemini.init(apiKey: GEMINI_API_KEY);
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    log(
+      'FlutterError: ${details.exceptionAsString()}',
+      stackTrace: details.stack,
+    );
+  };
+
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    log('Uncaught platform error: $error', stackTrace: stack);
+    return true;
+  };
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e, stack) {
+    log('Firebase initialization error: $e', stackTrace: stack);
+  }
+
+  try {
+    Gemini.init(apiKey: GEMINI_API_KEY);
+  } catch (e, stack) {
+    log('Gemini initialization error: $e', stackTrace: stack);
+  }
 
   runApp(
     ChangeNotifierProvider(
-        create: (context) => LoginSharedPrefs(), child: MyApplication()),
+      create: (context) => LoginSharedPrefs(),
+      child: MyApplication(),
+    ),
   );
 }
 
@@ -57,7 +86,8 @@ class MyApplication extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (_) => AuthProviderState(authRepository: AuthRepository())),
+          create: (_) => AuthProviderState(authRepository: authRepository),
+        ),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => SearchControllerProvider()),
         ChangeNotifierProvider(create: (_) => TextfieldProvider()),
@@ -69,19 +99,15 @@ class MyApplication extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FetchUpcomingCourses()),
         ChangeNotifierProvider(create: (_) => FollowProvider()),
         ChangeNotifierProvider(create: (_) => MediaProvider()),
-        ChangeNotifierProvider(create: (_) => FollowProvider()),
         ChangeNotifierProvider(create: (_) => StoryProvider()),
         ChangeNotifierProvider(create: (_) => CounterProvider()),
         ChangeNotifierProvider(create: (_) => FollowingsProvider()),
-        ChangeNotifierProvider(create: (_) => SearchControllerProvider()),
         ChangeNotifierProvider(create: (_) => LikeAnimationProvider()),
         ChangeNotifierProvider(create: (_) => LikeProvider()),
         ChangeNotifierProvider(create: (_) => ComplaintController()),
         ChangeNotifierProvider(create: (_) => SavePostProvider()),
         ChangeNotifierProvider(create: (_) => DummyPostController()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
-        ProxyProvider<TickerProvider, StoryStateController>(
-            update: (_, vsync, __) => StoryStateController(vsync, context))
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -89,9 +115,9 @@ class MyApplication extends StatelessWidget {
           scaffoldBackgroundColor: AppColors.oRwhite,
           appBarTheme: AppBarTheme(
             backgroundColor: AppColors.oRwhite,
-            iconTheme: IconThemeData(color: AppColors.oRBlack),
+            iconTheme: const IconThemeData(color: AppColors.oRBlack),
             elevation: 0,
-            titleTextStyle: TextStyle(
+            titleTextStyle: const TextStyle(
               color: AppColors.oRBlack,
               fontSize: 20,
               fontWeight: FontWeight.bold,

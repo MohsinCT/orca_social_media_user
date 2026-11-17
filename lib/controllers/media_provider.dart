@@ -16,8 +16,8 @@ import 'package:uuid/uuid.dart';
 
 class MediaProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final currentUser = FirebaseAuth.instance.currentUser!;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? get currentUser => _auth.currentUser;
 
   final picker = ImagePicker();
   XFile? _selectedImage;
@@ -75,15 +75,16 @@ class MediaProvider extends ChangeNotifier {
   }) async {
     if (_croppedImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select an image to upload.")));
+        const SnackBar(content: Text("Please select an image to upload.")),
+      );
       return;
     }
 
     try {
       final fileName = const Uuid().v4();
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('posts/${fileName}_${DateTime.now().toIso8601String()}');
+      final storageRef = FirebaseStorage.instance.ref().child(
+        'posts/${fileName}_${DateTime.now().toIso8601String()}',
+      );
 
       final uploadTask = storageRef.putFile(File(_croppedImage!.path));
       final snapshot = await uploadTask.whenComplete(() => {});
@@ -101,15 +102,17 @@ class MediaProvider extends ChangeNotifier {
       await createPost(userId, newPost.toMap());
 
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Post created successfully.")));
+        const SnackBar(content: Text("Post created successfully.")),
+      );
 
       // Reset form
       resetMedia();
       captionController.clear();
     } catch (e) {
       log('Error uploading media: $e');
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Error uploading media: $e")));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error uploading media: $e")));
     }
   }
 
@@ -140,9 +143,10 @@ class MediaProvider extends ChangeNotifier {
       final QuerySnapshot postSnapshot =
           await userDocRef.collection('posts').get();
 
-      final posts = postSnapshot.docs.map((doc) {
-        return PostModel.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
+      final posts =
+          postSnapshot.docs.map((doc) {
+            return PostModel.fromMap(doc.data() as Map<String, dynamic>);
+          }).toList();
 
       log('Fetched ${posts.length} posts');
       return posts;
@@ -155,13 +159,14 @@ class MediaProvider extends ChangeNotifier {
   Future<void> updatePostCaption(String postId, String newCaption) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
-      final postRef = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('posts')
-          .where('id', isEqualTo: postId)
-          .limit(1)
-          .get();
+      final postRef =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .collection('posts')
+              .where('id', isEqualTo: postId)
+              .limit(1)
+              .get();
       if (postRef != null) {
         final postUid = postRef.docs.first.id;
         await FirebaseFirestore.instance
@@ -178,13 +183,14 @@ class MediaProvider extends ChangeNotifier {
     log('this is the id  $postId');
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
-      final postRef = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('posts')
-          .where('id', isEqualTo: postId)
-          .limit(1)
-          .get();
+      final postRef =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .collection('posts')
+              .where('id', isEqualTo: postId)
+              .limit(1)
+              .get();
       if (postRef != null) {
         final postUid = postRef.docs.first.id;
         log('this is $postUid');
@@ -205,20 +211,25 @@ class MediaProvider extends ChangeNotifier {
         DocumentSnapshot userDoc =
             await _firestore.collection('users').doc(currentUser.uid).get();
         if (userDoc.exists) {
-          UserModel userModel =
-              UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
+          UserModel userModel = UserModel.fromMap(
+            userDoc.data() as Map<String, dynamic>,
+          );
 
-          QuerySnapshot querySnapshot = await _firestore
-              .collection('users')
-              .doc(currentUser.uid)
-              .collection('posts')
-              .orderBy('date', descending: true)
-              .get();
+          QuerySnapshot querySnapshot =
+              await _firestore
+                  .collection('users')
+                  .doc(currentUser.uid)
+                  .collection('posts')
+                  .orderBy('date', descending: true)
+                  .get();
 
-          List<PostModel> posts = querySnapshot.docs
-              .map((doc) =>
-                  PostModel.fromMap(doc.data() as Map<String, dynamic>))
-              .toList();
+          List<PostModel> posts =
+              querySnapshot.docs
+                  .map(
+                    (doc) =>
+                        PostModel.fromMap(doc.data() as Map<String, dynamic>),
+                  )
+                  .toList();
           return {'user': userModel, 'posts': posts};
         }
       }
@@ -249,36 +260,38 @@ class MediaProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Future<void> fetchFollowingsWithLatestPost(
-      String userId  ) async {
+  Future<void> fetchFollowingsWithLatestPost(String userId) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       List<Map<String, dynamic>> followingsDataWithPosts = [];
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
+      final userDoc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .get();
       final List<dynamic> followingsIds = userDoc.data()?['followings'] ?? [];
 
       if (followingsIds.isNotEmpty) {
         for (String followingsId in followingsIds) {
-          final followingsDoc = await FirebaseFirestore.instance
-              .collection('users')
-              .doc(followingsId)
-              .get();
+          final followingsDoc =
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(followingsId)
+                  .get();
 
           if (followingsDoc.exists) {
             // Fetch the latest post for this following user
-            QuerySnapshot postSnapshot = await FirebaseFirestore.instance
-                .collection('users')
-                .doc(followingsId)
-                .collection('posts')
-                .orderBy('date', descending: true)
-                .limit(1)
-                .get();
+            QuerySnapshot postSnapshot =
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(followingsId)
+                    .collection('posts')
+                    .orderBy('date', descending: true)
+                    .limit(1)
+                    .get();
 
             Map<String, dynamic> followingData = followingsDoc.data()!;
 
@@ -288,8 +301,8 @@ class MediaProvider extends ChangeNotifier {
               // followingData['latestPost']['id'] = postSnapshot.docs.first.id;
 
               followingData['latestPost'] = {
-                'id':postSnapshot.docs.first.id,
-                ...postSnapshot.docs.first.data() as Map<String , dynamic>
+                'id': postSnapshot.docs.first.id,
+                ...postSnapshot.docs.first.data() as Map<String, dynamic>,
               };
             } else {
               followingData['latestPost'] = null;
@@ -329,13 +342,16 @@ class MediaProvider extends ChangeNotifier {
         .collection('posts')
         .doc(postId);
 
+    final email = currentUser?.email;
+    if (email == null) return;
+
     if (postLikeStatus[postId] == true) {
       await postRef.update({
-        'likedUsers': FieldValue.arrayUnion([currentUser.email])
+        'likedUsers': FieldValue.arrayUnion([email]),
       });
     } else {
       await postRef.update({
-        'likedUsers': FieldValue.arrayRemove([currentUser.email])
+        'likedUsers': FieldValue.arrayRemove([email]),
       });
     }
   }
@@ -345,7 +361,7 @@ class MediaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-//
+  //
 
   @override
   void dispose() {

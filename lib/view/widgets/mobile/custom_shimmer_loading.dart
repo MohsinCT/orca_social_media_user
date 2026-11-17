@@ -5,7 +5,7 @@ import 'package:shimmer/shimmer.dart';
 class ShimmerLoading extends StatelessWidget {
   final MediaQueryHelper mediaQuery;
 
-  const ShimmerLoading({required this.mediaQuery, Key? key}) : super(key: key);
+  const ShimmerLoading({required this.mediaQuery, super.key});
 
   @override
   Widget build(BuildContext context) {

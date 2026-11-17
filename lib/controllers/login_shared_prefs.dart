@@ -14,7 +14,7 @@ class LoginSharedPrefs with ChangeNotifier {
   String? get username => _username;
   String? get profilePicture => _profilePicture;
 
-  logProvider() {
+  void logProvider() {
     _loadLoginStatus();
   }
 

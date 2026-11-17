@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/colors.dart';
 import 'package:orca_social_media/constants/media_query.dart';
-import 'package:orca_social_media/controllers/like_controller.dart';
 import 'package:orca_social_media/controllers/media_provider.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_post_shimmer.dart';
 import 'package:orca_social_media/view/widgets/mobile/custom_post_view.dart';
@@ -46,19 +45,20 @@ class PostView extends StatelessWidget {
           itemBuilder: (context, index) {
             final following = mediaProvider.followingDataWithPosts[index];
             final latestPosts = following['latestPost'];
-            final likeProvider =
-                Provider.of<LikeProvider>(context, listen: false);
+            if (latestPosts == null) {
+              return const SizedBox.shrink();
+            }
 
             return CustomFollowingPostView(
               id: userId,
-              userId: following['id'],
-              postId: latestPosts['id'],
-              username: following['username'],
-              image: latestPosts['image'],
-              date: latestPosts['date'],
-              profilPicture: following['profilePicture'],
-              usernameForCaption: following['username'],
-              caption: latestPosts['caption'],
+              userId: following['id'] ?? '',
+              postId: latestPosts['id'] ?? '',
+              username: following['username'] ?? '',
+              image: latestPosts['image'] ?? '',
+              date: latestPosts['date'] ?? '',
+              profilPicture: following['profilePicture'] ?? '',
+              usernameForCaption: following['username'] ?? '',
+              caption: latestPosts['caption'] ?? '',
               latestPosts: latestPosts,
             );
 

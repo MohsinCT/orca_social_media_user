@@ -71,9 +71,11 @@ class NotificationScreen extends StatelessWidget {
               return ListTile(
                 leading: CircleAvatar(
                   radius: 24,
-                  backgroundImage: notify['profilePicture'] != null
+                  backgroundImage: notify['profilePicture'] != null &&
+                          notify['profilePicture'].toString().isNotEmpty
                       ? NetworkImage(notify['profilePicture'])
-                      : const AssetImage('assets/default_profile.png') as ImageProvider,
+                      : const AssetImage('assets/default_person.avif')
+                          as ImageProvider,
                 ),
                 title: RichText(
                   text: TextSpan(

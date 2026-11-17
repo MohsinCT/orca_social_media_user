@@ -1,7 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/media_query.dart';
-import 'package:shimmer/shimmer.dart';
 
 class SStoryCircle extends StatelessWidget {
   const SStoryCircle({super.key});
@@ -14,16 +12,14 @@ class SStoryCircle extends StatelessWidget {
       child: ListView.builder(
         itemCount: 10,
         scrollDirection: Axis.horizontal,
-        itemBuilder: (context , index){
-            return  Container(
-              decoration: BoxDecoration(
-                
-              ),
-              width: 100,
-              height: 100,
-              
-            );
-        }),
+        itemBuilder: (context, index) {
+          return Container(
+            decoration: BoxDecoration(),
+            width: 100,
+            height: 100,
+          );
+        },
+      ),
     );
   }
 }

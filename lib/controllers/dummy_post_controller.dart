@@ -18,7 +18,7 @@ class DummyPostController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final ImagePicker picker = ImagePicker();
-  final currentUser = FirebaseAuth.instance.currentUser!;
+  User? get currentUser => _auth.currentUser;
   final String _collection = 'dummyposts';
   List<DummyPostModel> _posts = [];
   List<DummyPostModel> get posts => _posts;
@@ -85,21 +85,22 @@ class DummyPostController extends ChangeNotifier {
 
   Future<List<DummyPostModel>> fetchPosts(String userid) async {
     try {
-      final snapshot = await firestore
-          .collection('users')
-          .doc(userid)
-          .collection(_collection)
-          .get();
+      final snapshot =
+          await firestore
+              .collection('users')
+              .doc(userid)
+              .collection(_collection)
+              .get();
 
-      _posts = snapshot.docs
-          .map((doc) => DummyPostModel.fromMap(doc.data()))
-          .toList();
+      _posts =
+          snapshot.docs
+              .map((doc) => DummyPostModel.fromMap(doc.data()))
+              .toList();
 
-          return _posts;
-    
+      return _posts;
     } catch (e) {
       print('Error fetching posts $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -110,24 +111,27 @@ class DummyPostController extends ChangeNotifier {
         DocumentSnapshot userDoc =
             await firestore.collection('users').doc(currentUser.uid).get();
         if (userDoc.exists) {
-          UserModel userModel =
-              UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
-          QuerySnapshot querySnapshot = await firestore
-              .collection('users')
-              .doc(currentUser.uid)
-              .collection(_collection)
-              .orderBy('date', descending: true)
-              .get();
+          UserModel userModel = UserModel.fromMap(
+            userDoc.data() as Map<String, dynamic>,
+          );
+          QuerySnapshot querySnapshot =
+              await firestore
+                  .collection('users')
+                  .doc(currentUser.uid)
+                  .collection(_collection)
+                  .orderBy('date', descending: true)
+                  .get();
 
-          List<DummyPostModel> posts = querySnapshot.docs
-              .map((doc) =>
-                  DummyPostModel.fromMap(doc.data() as Map<String, dynamic>))
-              .toList();
+          List<DummyPostModel> posts =
+              querySnapshot.docs
+                  .map(
+                    (doc) => DummyPostModel.fromMap(
+                      doc.data() as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList();
 
-              return {
-                'user':userModel,
-                'dummyPosts':posts
-              };
+          return {'user': userModel, 'dummyPosts': posts};
         }
       }
       return null;
@@ -143,11 +147,12 @@ class DummyPostController extends ChangeNotifier {
       if (imageUrl == null) return;
       String postId = const Uuid().v4();
       DummyPostModel newPost = DummyPostModel(
-          id: postId,
-          userId: userId,
-          image: imageUrl,
-          caption: caption,
-          date: DateFormat('MMM,d,yyyy').format(DateTime.now()));
+        id: postId,
+        userId: userId,
+        image: imageUrl,
+        caption: caption,
+        date: DateFormat('MMM,d,yyyy').format(DateTime.now()),
+      );
 
       await firestore
           .collection('users')

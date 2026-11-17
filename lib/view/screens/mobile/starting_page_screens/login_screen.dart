@@ -17,7 +17,7 @@ import 'package:orca_social_media/view/widgets/mobile/custom_text_signup.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  LoginScreen({super.key});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -120,23 +120,24 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 Future<void> _signInWithGoogle(BuildContext context) async {
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn googleSignIn = GoogleSignIn.instance;
   try {
-    final GoogleSignInAccount? googleSignInAccount =
-        await _googleSignIn.signIn();
+    await googleSignIn.initialize();
+    final GoogleSignInAccount googleSignInAccount =
+        await googleSignIn.authenticate();
 
-    if (googleSignInAccount != null) {
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount.authentication;
+    final GoogleSignInAuthentication googleSignInAuthentication =
+        googleSignInAccount.authentication;
 
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        idToken: googleSignInAuthentication.idToken,
-        accessToken: googleSignInAuthentication.accessToken,
-      );
-      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-      await firebaseAuth.signInWithCredential(credential);
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      idToken: googleSignInAuthentication.idToken,
+    );
+    final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    await firebaseAuth.signInWithCredential(credential);
+    if (context.mounted) {
       Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => BottomNavScreen()));
+        MaterialPageRoute(builder: (context) => BottomNavScreen()),
+      );
     }
   } catch (e) {
     log('$e');

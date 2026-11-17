@@ -10,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:orca_social_media/models/post_model.dart';
 import 'package:orca_social_media/models/register_model.dart';
-// ignore: depend_on_referenced_packages
 import 'package:path/path.dart';
 import 'package:video_player/video_player.dart';
 
@@ -21,14 +20,14 @@ class UserProvider with ChangeNotifier {
   UserModel? _user;
   UserModel? get user => _user;
 
-  bool _isLoading = false;
+  final bool _isLoading = false;
   bool get isLoading => _isLoading;
 
   String? _userId;
 
   String? get userId => _userId;
 
-  List<UserModel> _usersList = [];
+  final List<UserModel> _usersList = [];
   List<UserModel> get usersList => _usersList;
 
   String? getLoggedUserId() {
@@ -47,12 +46,15 @@ class UserProvider with ChangeNotifier {
         DocumentSnapshot userDoc =
             await _firestore.collection('users').doc(currentUser.uid).get();
         if (userDoc.exists) {
-          _currentUserDetails =
-              UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
+          _currentUserDetails = UserModel.fromMap(
+            userDoc.data() as Map<String, dynamic>,
+          );
           notifyListeners();
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      log('Error fetching current user details: $e');
+    }
   }
 
   //--------------------------------FetchSingleUser------------------------------------//
@@ -82,7 +84,7 @@ class UserProvider with ChangeNotifier {
   void fetchCurrentUser() async {
     _loggedUserDetails = await fetchUserDetails();
     if (_loggedUserDetails != null) {
-      log('User fetched: ${_loggedUserDetails}');
+      log('User fetched: $_loggedUserDetails');
     } else {
       log('no user founc');
     }
@@ -91,10 +93,11 @@ class UserProvider with ChangeNotifier {
   //--------------------------------FetchAllUsers------------------------------------//
   Future<List<UserModel>> fetchAllUsers() async {
     try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
-          .orderBy('timestamp', descending: true) // Order by timestamp
-          .get();
+      QuerySnapshot querySnapshot =
+          await _firestore
+              .collection('users')
+              .orderBy('timestamp', descending: true) // Order by timestamp
+              .get();
       return querySnapshot.docs
           .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
           .toList();
@@ -142,9 +145,12 @@ class UserProvider with ChangeNotifier {
     if (_searchQuery.isEmpty) {
       _filteredUsers = [];
     } else {
-      _filteredUsers = _allUsers
-          .where((user) => user.username.toLowerCase().contains(_searchQuery))
-          .toList();
+      _filteredUsers =
+          _allUsers
+              .where(
+                (user) => user.username.toLowerCase().contains(_searchQuery),
+              )
+              .toList();
     }
     notifyListeners();
   }
@@ -181,35 +187,33 @@ class UserProvider with ChangeNotifier {
     required File profilPicture,
   }) async {
     try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       String? downloadImage = await uploadImage(profilPicture);
 
       UserModel newUser = UserModel(
-          id: userCredential.user!.uid,
-          email: email,
-          password: password,
-          username: username,
-          profilPicture: downloadImage.toString(),
-          nickname: 'Add nickname',
-          bio: 'Add Bio',
-          location: 'Add location',
-          date: DateFormat('MMM,d,yyyy').format(DateTime.now()),
-          postCount: 0,
-          timestamp: DateTime.now(),
-          followersCount: 0,
-          followingCount: 0,
-          followers: [],
-          followings: [],
-          likedUser: [],
-          likesCount: 0,
-          isDisabled: false,
-          isOnline: false, 
-          unreadNotification: 0);
+        id: userCredential.user!.uid,
+        email: email,
+        password: password,
+        username: username,
+        profilPicture: downloadImage.toString(),
+        nickname: 'Add nickname',
+        bio: 'Add Bio',
+        location: 'Add location',
+        date: DateFormat('MMM,d,yyyy').format(DateTime.now()),
+        postCount: 0,
+        timestamp: DateTime.now(),
+        followersCount: 0,
+        followingCount: 0,
+        followers: [],
+        followings: [],
+        likedUser: [],
+        likesCount: 0,
+        isDisabled: false,
+        isOnline: false,
+        unreadNotification: 0,
+      );
 
       await _firestore
           .collection('users')
@@ -227,8 +231,9 @@ class UserProvider with ChangeNotifier {
   Future<String?> uploadImage(File image) async {
     try {
       String fileName = basename(image.path);
-      Reference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child('uploads/$fileName');
+      Reference firebaseStorageRef = FirebaseStorage.instance.ref().child(
+        'uploads/$fileName',
+      );
       UploadTask uploadTask = firebaseStorageRef.putFile(image);
       TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => {});
       String downloadUrl = await taskSnapshot.ref.getDownloadURL();
@@ -308,11 +313,12 @@ class UserProvider with ChangeNotifier {
         return [];
       }
 
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
-          .where('username', isGreaterThanOrEqualTo: query)
-          .where('username', isLessThanOrEqualTo: query + '\uf8ff')
-          .get();
+      QuerySnapshot querySnapshot =
+          await _firestore
+              .collection('users')
+              .where('username', isGreaterThanOrEqualTo: query)
+              .where('username', isLessThanOrEqualTo: '$query\uf8ff')
+              .get();
 
       return querySnapshot.docs
           .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
@@ -337,12 +343,13 @@ class UserProvider with ChangeNotifier {
     try {
       User? currentUser = _auth.currentUser;
       if (currentUser != null) {
-        QuerySnapshot querySnapshot = await _firestore
-            .collection('users')
-            .doc(currentUser.uid)
-            .collection('posts')
-            .orderBy('date', descending: true)
-            .get();
+        QuerySnapshot querySnapshot =
+            await _firestore
+                .collection('users')
+                .doc(currentUser.uid)
+                .collection('posts')
+                .orderBy('date', descending: true)
+                .get();
 
         return querySnapshot.docs
             .map((doc) => PostModel.fromMap(doc.data() as Map<String, dynamic>))
@@ -357,12 +364,13 @@ class UserProvider with ChangeNotifier {
 
   Future<List<PostModel>> fetchPostsByUserId(String userId) async {
     try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('posts')
-          .orderBy('date', descending: true)
-          .get();
+      QuerySnapshot querySnapshot =
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('posts')
+              .orderBy('date', descending: true)
+              .get();
 
       return querySnapshot.docs
           .map((doc) => PostModel.fromMap(doc.data() as Map<String, dynamic>))
@@ -379,10 +387,9 @@ class UserProvider with ChangeNotifier {
         _user!.postCount++;
         notifyListeners();
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userId)
-            .update({'postCount': _user!.postCount});
+        await FirebaseFirestore.instance.collection('users').doc(userId).update(
+          {'postCount': _user!.postCount},
+        );
       }
     } catch (e) {
       log('not incresed$e');
@@ -428,8 +435,10 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> pickMedia(
-      {required bool isGallery, required bool isVideo}) async {
+  Future<void> pickMedia({
+    required bool isGallery,
+    required bool isVideo,
+  }) async {
     if (isVideo) {
       _selectedVideo = await picker.pickVideo(
         source: isGallery ? ImageSource.gallery : ImageSource.camera,
@@ -473,8 +482,9 @@ class UserProvider with ChangeNotifier {
   Future<String?> uploadMedia(File media, String folder) async {
     try {
       String fileName = basename(media.path);
-      Reference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child('$folder/$fileName');
+      Reference firebaseStorageRef = FirebaseStorage.instance.ref().child(
+        '$folder/$fileName',
+      );
       UploadTask uploadTask = firebaseStorageRef.putFile(media);
       TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => {});
       return await taskSnapshot.ref.getDownloadURL();
@@ -522,7 +532,7 @@ class UserProvider with ChangeNotifier {
   }
 
   //--------------------------------FetchLatestPosts------------------------------------//
-  List<PostModel> _posts = [];
+  final List<PostModel> _posts = [];
   List<PostModel> get posts => _posts;
 
   Future<void> fetchLatestPosts(String userId) async {
@@ -549,14 +559,17 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> updateComplaint(
-      BuildContext context, String userId, String newComplaint) async {
+    BuildContext context,
+    String userId,
+    String newComplaint,
+  ) async {
     try {
-      await _firestore
-          .collection('users')
-          .doc(userId)
-          .update({'complaint': newComplaint});
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Complaint send successfullyy')));
+      await _firestore.collection('users').doc(userId).update({
+        'complaint': newComplaint,
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Complaint send successfullyy')));
     } catch (e) {
       log('Error sending complaint $e');
     }

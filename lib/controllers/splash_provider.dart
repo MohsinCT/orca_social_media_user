@@ -45,9 +45,9 @@ class SplashProvider with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? status = prefs.getBool('isLoggedIn');  // Fetch the login status
 
-    bool _isLoggedIn = status ?? false; // Use false as default if null
-    print('Login Status Fetched: $_isLoggedIn');
-    return _isLoggedIn;
+    bool isLoggedIn = status ?? false; // Use false as default if null
+    print('Login Status Fetched: $isLoggedIn');
+    return isLoggedIn;
   }
 
   @override

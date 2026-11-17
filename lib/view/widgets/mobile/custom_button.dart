@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/bottom_nav_screen.dart';
@@ -160,36 +162,46 @@ class SignUpButton extends StatelessWidget {
   final TextEditingController usernameController;
   final TextEditingController emailController;
   final TextEditingController passwordController;
-  final image;
+  final File? image;
 
-  const SignUpButton({super.key, 
-  required this.formKey, 
-  required this.usernameController, 
-  required this.emailController, 
-  required this.passwordController,
-  required this.image});
+  const SignUpButton({
+    super.key,
+    required this.formKey,
+    required this.usernameController,
+    required this.emailController,
+    required this.passwordController,
+    required this.image,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context , listen: false);
     final mediaQuery = MediaQueryHelper(context);
-    return  ChangeNotifierProvider(
+    return ChangeNotifierProvider(
       create: (context) => LoadingProvider(),
-      child: Consumer2<LoginSharedPrefs , LoadingProvider>(
-        builder: (context,loginSharedPrefs, loadingProvider, child) {
-          return  GestureDetector(
-          onTap: loadingProvider.isLoading
-              ? null
-              : () async {
-                  if (formKey.currentState!.validate()) {
-                    loadingProvider.setLoading(true); // Set loading to true
-                    try {
-                      await Provider.of<UserProvider>(context, listen: false)
-                          .registerUser(
-                              username: usernameController.text,
-                              email: emailController.text,
-                              password: passwordController.text,
-                              profilPicture: image);
+      child: Consumer2<LoginSharedPrefs, LoadingProvider>(
+        builder: (context, loginSharedPrefs, loadingProvider, child) {
+          return GestureDetector(
+              onTap: loadingProvider.isLoading
+                  ? null
+                  : () async {
+                      if (formKey.currentState!.validate()) {
+                        if (image == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please select a profile picture'),
+                            ),
+                          );
+                          return;
+                        }
+                        loadingProvider.setLoading(true); // Set loading to true
+                        try {
+                          await Provider.of<UserProvider>(context,
+                                  listen: false)
+                              .registerUser(
+                                  username: usernameController.text,
+                                  email: emailController.text,
+                                  password: passwordController.text,
+                                  profilPicture: image!);
 
                       loginSharedPrefs.setLoginStatus(true);
 

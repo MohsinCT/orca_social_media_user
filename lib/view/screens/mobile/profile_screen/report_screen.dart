@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class ReportPage extends StatelessWidget {
+  ReportPage({super.key});
+
   final TextEditingController _reportController = TextEditingController();
 
   void _sendReport(BuildContext context) {

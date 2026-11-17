@@ -32,8 +32,6 @@ class UserProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQueryHelper(context);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-     
-    final currentUser =  userProvider.getLoggedUserId();
 
     return DefaultTabController(
       length: tabNames.length,
@@ -232,14 +230,9 @@ class UserProfile extends StatelessWidget {
                                                       ),
                                                     ),
                                                   )
-                                                : post.video.isNotEmpty
-                                                    ? const Icon(
-                                                        Icons.video_library,
-                                                        color: Colors.grey,
-                                                      )
-                                                    : const Center(
-                                                        child: Text('No Media'),
-                                                      ),
+                                                : const Center(
+                                                    child: Text('No Media'),
+                                                  ),
                                           ),
                                         );
                                       },

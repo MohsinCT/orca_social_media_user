@@ -110,11 +110,6 @@ class StoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   //----------------------CRUD---------------------->>
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

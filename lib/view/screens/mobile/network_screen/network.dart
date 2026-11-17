@@ -11,7 +11,7 @@ import 'package:orca_social_media/view/widgets/mobile/custom_appbar.dart';
 import 'package:provider/provider.dart';
 
 class NetworkScreen extends StatelessWidget {
-  NetworkScreen({super.key});
+  const NetworkScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

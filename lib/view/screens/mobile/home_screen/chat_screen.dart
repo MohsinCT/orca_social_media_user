@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:orca_social_media/constants/media_query.dart';
@@ -17,7 +16,7 @@ class ChatScreen extends StatefulWidget {
   final ChatUser user;
   final String userID;
 
-  ChatScreen({
+  const ChatScreen({
     super.key,
     required this.user,
     required this.userID,

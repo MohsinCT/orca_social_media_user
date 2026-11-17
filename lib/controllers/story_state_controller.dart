@@ -18,7 +18,7 @@ class StoryStateController with ChangeNotifier {
 
     // Add status listener to pop the screen when animation is complete
     _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
+      if (status == AnimationStatus.completed && context.mounted) {
         Navigator.of(context).pop(); // Pop the current screen
       }
     });
@@ -29,5 +29,11 @@ class StoryStateController with ChangeNotifier {
   // Dispose the controller to avoid memory leaks
   void disposeController() {
     _controller.dispose();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

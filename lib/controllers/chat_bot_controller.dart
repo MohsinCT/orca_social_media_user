@@ -1,8 +1,6 @@
-import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
+import 'package:orca_social_media/models/messages_model.dart';
 
-class ChatBotController extends ChangeNotifier{
+class ChatBotController extends ChangeNotifier {
   List<ChatMessage> messages = [];
-
-  
 }

@@ -126,6 +126,8 @@ import 'package:shimmer/shimmer.dart';
 // }
 
 class UserProfileShimmer extends StatelessWidget {
+  const UserProfileShimmer({super.key});
+
   @override
   Widget build(BuildContext context) {
    final mediaQuery = MediaQueryHelper(context);
@@ -188,7 +190,7 @@ class ShimmerBox extends StatelessWidget {
   final double width;
   final double height;
 
-  const ShimmerBox({required this.width, required this.height});
+  const ShimmerBox({super.key, required this.width, required this.height});
 
   @override
   Widget build(BuildContext context) {
@@ -209,9 +211,11 @@ class ShimmerBox extends StatelessWidget {
 
 /// **Reusable Shimmer ListTile**
 class ShimmerListTile extends StatelessWidget {
+  const ShimmerListTile({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return const ListTile(
       leading: ShimmerBox(width: 24, height: 24),
       title: ShimmerBox(width: 150, height: 14),
     );

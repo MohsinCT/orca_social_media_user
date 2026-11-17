@@ -64,7 +64,7 @@ class UsersSearchList extends StatelessWidget {
                         return GestureDetector(
                           onTap: () {
                             user.id == currentUser
-                                ? navigationProvider.setCurrentIndex(4)
+                                ? navigationProvider.setCurrentIndex(3)
                                 : Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) =>
                                         UserProfile(userId: user.id)));

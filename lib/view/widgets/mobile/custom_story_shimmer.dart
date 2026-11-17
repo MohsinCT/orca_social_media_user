@@ -20,8 +20,8 @@ class StoryShimmer extends StatelessWidget {
             child: Column(
               children: [
                 Shimmer.fromColors(
-                  baseColor: AppColors.oRLightGrey.withOpacity(0.5),
-                  highlightColor: Colors.white.withOpacity(0.3),
+                  baseColor: AppColors.oRLightGrey.withValues(alpha: 0.5),
+                  highlightColor: Colors.white.withValues(alpha: 0.3),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
@@ -56,8 +56,8 @@ class StoryShimmer extends StatelessWidget {
                 ),
                 SizedBox(height: mediaQuery.screenHeight * 0.01),
                 Shimmer.fromColors(
-                  baseColor: AppColors.oRLightGrey.withOpacity(0.5),
-                  highlightColor: Colors.white.withOpacity(0.3),
+                  baseColor: AppColors.oRLightGrey.withValues(alpha: 0.5),
+                  highlightColor: Colors.white.withValues(alpha: 0.3),
                   child: Container(
                     width: mediaQuery.screenWidth * 0.12,
                     height: 12,

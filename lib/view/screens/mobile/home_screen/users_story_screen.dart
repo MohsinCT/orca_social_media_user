@@ -81,7 +81,7 @@ class UsersStories extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: mediaQuery.screenWidth,
                         height: mediaQuery.screenHeight * 0.79,
                         child: CachedNetworkImage(
@@ -93,9 +93,9 @@ class UsersStories extends StatelessWidget {
                       Center(
                         child: Text(
                           story.caption,
-                          // ignore: deprecated_member_use
-                          style:
-                              TextStyle(color: Colors.white.withOpacity(0.6)),
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.6),
+                          ),
                         ),
                       ),
                     ],

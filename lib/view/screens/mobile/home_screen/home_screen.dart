@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:orca_social_media/constants/colors.dart';
@@ -8,6 +7,7 @@ import 'package:orca_social_media/constants/media_query.dart';
 import 'package:orca_social_media/controllers/auth/register.dart';
 import 'package:orca_social_media/controllers/fetch_datas_controller.dart';
 import 'package:orca_social_media/controllers/notification_controller.dart';
+import 'package:orca_social_media/models/messages_model.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/messages.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/notification_screen.dart';
 import 'package:orca_social_media/view/screens/mobile/home_screen/user_postview.dart';

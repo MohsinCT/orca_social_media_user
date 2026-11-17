@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 class StoryAddingPage extends StatefulWidget {
   final String? userId;
 
-  StoryAddingPage({super.key, required this.userId});
+  const StoryAddingPage({super.key, required this.userId});
 
   @override
   State<StoryAddingPage> createState() => _StoryAddingPageState();
@@ -52,12 +52,12 @@ class _StoryAddingPageState extends State<StoryAddingPage> {
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: storyProvider.selectedImage != null
+                        child: storyProvider.croppedImg != null
                             ? Image.file(
                                 File(storyProvider.croppedImg!.path),
                                 fit: BoxFit.cover,
                               )
-                            : Center(child: Text("Tap to select an image")),
+                            : const Center(child: Text("Tap to select an image")),
                       ),
                     ),
                     SizedBox(height: 16),

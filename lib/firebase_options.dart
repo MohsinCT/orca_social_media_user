@@ -23,15 +23,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
@@ -62,6 +56,15 @@ class DefaultFirebaseOptions {
     messagingSenderId: '46291325751',
     projectId: 'orca-socialmedia-e8c58',
     storageBucket: 'orca-socialmedia-e8c58.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBpjuJlDM49iIqumbkOWEZNZxAiJUmpib8',
+    appId: '1:46291325751:ios:6da52e459de29fed3ec0b2',
+    messagingSenderId: '46291325751',
+    projectId: 'orca-socialmedia-e8c58',
+    storageBucket: 'orca-socialmedia-e8c58.appspot.com',
+    iosBundleId: 'com.example.orcaSocialMedia',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

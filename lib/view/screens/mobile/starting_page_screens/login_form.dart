@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:orca_social_media/constants/bottom_nav_screen.dart';
 import 'package:orca_social_media/constants/media_query.dart';

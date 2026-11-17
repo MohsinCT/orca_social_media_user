@@ -49,7 +49,7 @@ class PostDetailDialog extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
+              SizedBox(
                 width: mediaQuery.screenWidth,
                 height: mediaQuery.screenHeight,
                 child: Column(

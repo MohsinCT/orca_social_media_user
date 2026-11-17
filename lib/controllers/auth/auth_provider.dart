@@ -13,75 +13,81 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 class AuthProviderState extends ChangeNotifier {
- 
- final AuthRepository authRepository;
- final FirebaseAuth _auth = FirebaseAuth.instance;
- final GoogleSignIn _googleSignIn = GoogleSignIn();
-   
-   User? _user;
-   User? get user => _user;
+  final AuthRepository authRepository;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  bool _isGoogleInitialized = false;
 
-  AuthProviderState({required this.authRepository}){
+  User? _user;
+  User? get user => _user;
+
+  AuthProviderState({required this.authRepository}) {
     authRepository.authStateChanges.listen(_onAuthStateChanged);
   }
 
-  Future<void> signInWithEmailAndPassword(String email , String password) async {
-    try{
+  Future<void> _ensureGoogleInitialized() async {
+    if (!_isGoogleInitialized) {
+      await _googleSignIn.initialize();
+      _isGoogleInitialized = true;
+    }
+  }
+
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    try {
       _user = await authRepository.signInWithEmailAndPassword(email, password);
       notifyListeners();
-    } catch (e){
+    } catch (e) {
       rethrow;
     }
   }
 
-
-  Future<void> signInWithGoogle()async{
-    try{
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if(googleUser == null) return;
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+  Future<void> signInWithGoogle() async {
+    try {
+      await _ensureGoogleInitialized();
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
       final OAuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken:  googleAuth.idToken,
+        idToken: googleAuth.idToken,
       );
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
 
       _user = userCredential.user;
       notifyListeners();
-
-    }catch(e){
+    } catch (e) {
       log('Error during Google Sign-In: $e');
-
     }
-
-
   }
 
-  Future<void> signOut() async{
-  await authRepository.signOut();
-  await _googleSignIn.signOut();
-  _user = null;
-  notifyListeners();
-}
-
-
- sharedpref(bool val)async{
-     SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', val);
-
- }
-void _onAuthStateChanged(User? user){
-  _user = user;
-  notifyListeners();
-}
-
-Future<Map<String , dynamic>?> getUserDetails() async{
-  if(_user == null){
-    return {};
+  Future<void> signOut() async {
+    await authRepository.signOut();
+    try {
+      await _ensureGoogleInitialized();
+      await _googleSignIn.signOut();
+    } catch (e) {
+      log('Google signOut error: $e');
+    }
+    _user = null;
+    notifyListeners();
   }
-  return await authRepository.getUserDetails(_user!.uid);
-}
+
+  Future<void> sharedpref(bool val) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', val);
+  }
+
+  void _onAuthStateChanged(User? user) {
+    _user = user;
+    notifyListeners();
+  }
+
+  Future<Map<String, dynamic>?> getUserDetails() async {
+    if (_user == null) {
+      return {};
+    }
+    return await authRepository.getUserDetails(_user!.uid);
+  }
 }
 
 
